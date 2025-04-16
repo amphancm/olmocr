@@ -104,7 +104,38 @@ def fetch_s3_file(s3_url: str, local_path: str) -> str:
     return local_path
 
 
-def process_pdf(pdf_path: str, first_n_pages: int, max_sample_pages: int, no_filter: bool) -> Generator[dict, None, None]:
+# def process_pdf(pdf_path: str, first_n_pages: int, max_sample_pages: int, no_filter: bool) -> Generator[dict, None, None]:
+#     if pdf_path.startswith("s3://"):
+#         local_pdf_path = os.path.join("/tmp", os.path.basename(pdf_path))
+#         fetch_s3_file(pdf_path, local_pdf_path)
+#     else:
+#         local_pdf_path = pdf_path
+
+#     if (not no_filter) and pdf_filter.filter_out_pdf(local_pdf_path):
+#         print(f"Skipping {local_pdf_path} due to common filter")
+#         return []
+
+#     pretty_pdf_path = pdf_path
+
+#     pdf = PdfReader(local_pdf_path)
+#     num_pages = len(pdf.pages)
+
+#     sample_pages = sample_pdf_pages(num_pages, first_n_pages, max_sample_pages)
+
+#     result = []
+#     for page in sample_pages:
+#         try:
+#             query = build_page_query(local_pdf_path, pretty_pdf_path, page)
+#             result.append(query)
+#         except Exception as e:
+#             print(f"Error processing page {page} of {pdf_path}: {e}")
+
+#     return result
+
+
+from typing import List
+
+def process_pdf(pdf_path: str, first_n_pages: int, max_sample_pages: int, no_filter: bool) -> List[dict]:
     if pdf_path.startswith("s3://"):
         local_pdf_path = os.path.join("/tmp", os.path.basename(pdf_path))
         fetch_s3_file(pdf_path, local_pdf_path)
@@ -116,7 +147,6 @@ def process_pdf(pdf_path: str, first_n_pages: int, max_sample_pages: int, no_fil
         return []
 
     pretty_pdf_path = pdf_path
-
     pdf = PdfReader(local_pdf_path)
     num_pages = len(pdf.pages)
 
@@ -129,9 +159,8 @@ def process_pdf(pdf_path: str, first_n_pages: int, max_sample_pages: int, no_fil
             result.append(query)
         except Exception as e:
             print(f"Error processing page {page} of {pdf_path}: {e}")
-
+    print(len(result))
     return result
-
 
 def main():
     parser = argparse.ArgumentParser(description="Sample PDFs and create requests for GPT-4o.")
