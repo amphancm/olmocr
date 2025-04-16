@@ -164,7 +164,82 @@ def get_done_total(folder_path):
     return processing, done, total
 
 
-# Main function to process all .jsonl files in a folder
+# # Main function to process all .jsonl files in a folder
+# def process_folder(folder_path: str, max_gb: int):
+#     output_folder = f"{folder_path.rstrip('/')}_done"
+#     os.makedirs(output_folder, exist_ok=True)
+#     last_loop_time = datetime.datetime.now()
+
+#     starting_free_space = MAX_OPENAI_DISK_SPACE - get_total_space_usage()
+
+#     if starting_free_space < (max_gb * 1024**3) * 2:
+#         raise ValueError(
+#             f"Insufficient free space in OpenAI's file storage: Only {starting_free_space} GB left, but 2x{max_gb} GB are required (1x for your uploads, 1x for your results)."
+#         )
+
+#     while not all(state["state"] in FINISHED_STATES for state in get_state(folder_path).values()):
+
+#         processing, done, total = get_done_total(folder_path)
+#         print(f"Total items {total}, processing {processing}, done {done}, {done/total*100:.1f}%")
+
+#         work_item = get_next_work_item(folder_path)
+#         print(f"Processing {os.path.basename(work_item['filename'])}, cur status = {work_item['state']}")
+
+#         # If all work items have been checked on, then you need to sleep a bit
+#         if last_loop_time > datetime.datetime.now() - datetime.timedelta(seconds=1):
+#             time.sleep(0.2)
+
+#         if work_item["state"] == "init":
+#             if get_estimated_space_usage(folder_path) < (max_gb * 1024**3):
+#                 try:
+#                     batch_id = upload_and_start_batch(os.path.join(folder_path, work_item["filename"]))
+#                     update_state(folder_path, work_item["filename"], state="processing", batch_id=batch_id)
+#                 except Exception as ex:
+#                     print(ex)
+#                     update_state(folder_path, work_item["filename"], state="init")
+#             else:
+#                 print("waiting for something to finish processing before uploading more")
+#                 # Update the time you checked so you can move onto the next time
+#                 update_state(folder_path, work_item["filename"])
+#         elif work_item["state"] == "processing":
+#             batch_data = client.batches.retrieve(work_item["batch_id"])
+
+#             if batch_data.status == "completed":
+#                 batch_id, success = download_batch_result(work_item["batch_id"], output_folder)
+
+#                 if success:
+#                     update_state(folder_path, work_item["filename"], state="completed")
+#                 else:
+#                     update_state(folder_path, work_item["filename"], state="errored_out")
+
+#                 try:
+#                     client.files.delete(batch_data.input_file_id)
+#                 except Exception as ex:
+#                     print(ex)
+#                     print("Could not delete old input data")
+
+#                 try:
+#                     client.files.delete(batch_data.output_file_id)
+#                 except Exception as ex:
+#                     print(ex)
+#                     print("Could not delete old output data")
+#             elif batch_data.status in ["failed", "expired", "cancelled"]:
+#                 update_state(folder_path, work_item["filename"], state="errored_out")
+
+#                 try:
+#                     client.files.delete(batch_data.input_file_id)
+#                 except:
+#                     print("Could not delete old file data")
+#             else:
+#                 # Update the time you checked so you can move onto the next time
+#                 update_state(folder_path, work_item["filename"])
+
+#         last_loop_time = datetime.datetime.now()
+
+#     print("All work has been completed")
+
+
+
 def process_folder(folder_path: str, max_gb: int):
     output_folder = f"{folder_path.rstrip('/')}_done"
     os.makedirs(output_folder, exist_ok=True)
@@ -174,14 +249,20 @@ def process_folder(folder_path: str, max_gb: int):
 
     if starting_free_space < (max_gb * 1024**3) * 2:
         raise ValueError(
-            f"Insufficient free space in OpenAI's file storage: Only {starting_free_space} GB left, but 2x{max_gb} GB are required (1x for your uploads, 1x for your results)."
+            f"Insufficient free space in OpenAI's file storage: Only {starting_free_space} GB left, "
+            f"but 2x{max_gb} GB are required (1x for your uploads, 1x for your results)."
         )
 
     while not all(state["state"] in FINISHED_STATES for state in get_state(folder_path).values()):
         processing, done, total = get_done_total(folder_path)
-        print(f"Total items {total}, processing {processing}, done {done}, {done/total*100:.1f}%")
+        print(f"Total items {total}, processing {processing}, done {done}, {done / total * 100:.1f}%")
 
         work_item = get_next_work_item(folder_path)
+
+        if work_item is None:
+            time.sleep(0.2)
+            continue
+
         print(f"Processing {os.path.basename(work_item['filename'])}, cur status = {work_item['state']}")
 
         # If all work items have been checked on, then you need to sleep a bit
@@ -197,11 +278,16 @@ def process_folder(folder_path: str, max_gb: int):
                     print(ex)
                     update_state(folder_path, work_item["filename"], state="init")
             else:
-                print("waiting for something to finish processing before uploading more")
-                # Update the time you checked so you can move onto the next time
+                print("Waiting for something to finish processing before uploading more.")
                 update_state(folder_path, work_item["filename"])
+
         elif work_item["state"] == "processing":
-            batch_data = client.batches.retrieve(work_item["batch_id"])
+            try:
+                batch_data = client.batches.retrieve(work_item["batch_id"])
+            except Exception as ex:
+                print(f"Error retrieving batch: {ex}")
+                update_state(folder_path, work_item["filename"])
+                continue
 
             if batch_data.status == "completed":
                 batch_id, success = download_batch_result(work_item["batch_id"], output_folder)
@@ -212,31 +298,34 @@ def process_folder(folder_path: str, max_gb: int):
                     update_state(folder_path, work_item["filename"], state="errored_out")
 
                 try:
-                    client.files.delete(batch_data.input_file_id)
+                    if batch_data.input_file_id:
+                        client.files.delete(batch_data.input_file_id)
                 except Exception as ex:
                     print(ex)
                     print("Could not delete old input data")
 
                 try:
-                    client.files.delete(batch_data.output_file_id)
+                    if batch_data.output_file_id:
+                        client.files.delete(batch_data.output_file_id)
                 except Exception as ex:
                     print(ex)
                     print("Could not delete old output data")
+
             elif batch_data.status in ["failed", "expired", "cancelled"]:
                 update_state(folder_path, work_item["filename"], state="errored_out")
 
                 try:
-                    client.files.delete(batch_data.input_file_id)
-                except:
-                    print("Could not delete old file data")
+                    if batch_data.input_file_id:
+                        client.files.delete(batch_data.input_file_id)
+                except Exception as ex:
+                    print(ex)
+                    print("Could not delete old input file data")
             else:
-                # Update the time you checked so you can move onto the next time
                 update_state(folder_path, work_item["filename"])
 
         last_loop_time = datetime.datetime.now()
 
     print("All work has been completed")
-
 
 if __name__ == "__main__":
     # Set up argument parsing for folder input
