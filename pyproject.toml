@@ -35,8 +35,8 @@ dependencies = [
   "zstandard",
   "boto3",
   "httpx",
-  "torch>=2.5.1",
-  "transformers==4.46.2",
+  #"torch>=2.5.1",
+  #"transformers==4.46.2",
   "img2pdf",
   "beaker-py",
 ]
@@ -95,8 +95,8 @@ bench = [
 ]
 
 train = [
-    "torch",
-    "torchvision",
+    #"torch",
+    #"torchvision",
     "accelerate",
     "datasets",
     "peft",
@@ -105,7 +105,7 @@ train = [
     "s3fs",
     "necessary",
     "einops",
-    "transformers>=4.45.1"
+    #"transformers>=4.45.1"
 ]
 
 elo = [
