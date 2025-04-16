@@ -28,7 +28,7 @@ from olmocr.train.core.loggers import get_logger
 from olmocr.train.core.paths import copy_dir, join_path
 from olmocr.train.core.state import BeakerState
 
-from .utils import (
+from olmocr.train.utils import (
     RunName,
     TruncatingCollator,
     get_local_dir,
