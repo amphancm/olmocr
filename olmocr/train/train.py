@@ -99,6 +99,7 @@ def run_train(config: TrainConfig):
     setup_environment(aws_config=config.aws, wandb_config=config.wandb, WANDB_RUN_GROUP=run_name.group)
 
     processor = AutoProcessor.from_pretrained(config.model.name_or_path, trust_remote_code=True)
+    
     train_dataset, valid_dataset = make_dataset(config, processor)
     logger.info(train_dataset)
     logger.info(valid_dataset)

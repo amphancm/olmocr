@@ -125,7 +125,7 @@ def cache_s3_files(dataset: Dataset, pdf_cache_location: str, num_proc: int = 32
             # Download the file and cache it locally
             #local_path = _cache_s3_file(s3_path, pdf_cache_location)
             #return {"local_pdf_path": local_path}
-            return {"local_pdf_path": pdf_cache_location}
+            return {"local_pdf_path": s3_path}
         return {"local_pdf_path": None}
 
     # Map the caching function to the dataset (with parallelism if needed)
@@ -139,6 +139,7 @@ def build_finetuning_dataset(response_glob_path: str, pdf_cache_location: Option
         pdf_cache_location = os.path.join(os.path.expanduser("~"), ".cache", "olmocr_pdfs")
 
     logger.info("Loading fine tuning dataset from OpenAI style batch responses")
+    
     response_data = load_jsonl_into_ds(response_glob_path)
     response_data = response_data["train"]
 
