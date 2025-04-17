@@ -167,7 +167,7 @@ def main():
     parser.add_argument("--glob_path", type=str, help="Local or S3 path glob (e.g., *.pdf or s3://bucket/pdfs/*.pdf).")
     parser.add_argument("--path_list", type=str, help="Path to a file containing paths to PDFs, one per line.")
     parser.add_argument("--no_filter", action="store_true", help="Disables the basic spam/language filtering so that ALL pdfs listed are used")
-    parser.add_argument("--num_sample_docs", type=int, default=5000, help="Number of PDF documents to sample.")
+    parser.add_argument("--num_sample_docs", type=int, default=100, help="Number of PDF documents to sample.")
     parser.add_argument("--first_n_pages", type=int, default=0, help="Always sample the first N pages of each PDF.")
     parser.add_argument("--max_sample_pages", type=int, default=15, help="Max number of pages to sample per PDF.")
     parser.add_argument("--output", type=str, default="openai_batch_data", help="Output destination")

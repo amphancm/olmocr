@@ -42,6 +42,8 @@ def get_anchor_text(
 
         return best_option
     elif pdf_engine == "pdfreport":
+
+        
         return _linearize_pdf_report(_pdf_report(local_pdf_path, page), max_length=target_length)
     else:
         raise NotImplementedError("Unknown engine")
