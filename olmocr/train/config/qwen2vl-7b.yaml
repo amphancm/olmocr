@@ -1,10 +1,10 @@
 model:
-  name_or_path: Qwen/Qwen2-VL-7B-Instruct
+  name_or_path: allenai/olmOCR-7B-0225-preview
   arch: causal
   use_flash_attn: true
 
 wandb:
-  project: pdelfin
+  project: Fine-tune olmOCR Thai
   entity: ai2-llm
 
 generate:
@@ -12,30 +12,24 @@ generate:
 
 train_data:
   seed: 1337
-  cache_location: /data/jakep/pdfdata/pdelfin_cache
+  cache_location: pdfs
   sources:
-    - name: openai_batch_data_v5_1_train
-      response_glob_path: /data/jakep/pdfdata/openai_batch_data_v5_1_train_done/*.json
+    - name:  openai_batch_data_train
+      response_glob_path: olmocr/data/trainset/*.json
       target_longest_image_dim: [1024]
       target_anchor_text_len: [6000]
-    - name: openai_batch_data_v5_1_iabooks_train
-      response_glob_path: /data/jakep/pdfdata/openai_batch_data_v5_1_iabooks_train_done/*.json
-      target_longest_image_dim: [1024]
-      target_anchor_text_len: [6000]
+ 
 
 valid_data:
-  cache_location: /data/jakep/pdfdata/pdelfin_cache
-  metric_for_best_model: openai_batch_data_v5_1_eval_loss
+  cache_location: pdfs
+  metric_for_best_model: openai_batch_data_eval_loss
   sources:
     # These tend to be small, so you can load from s3 it's no big deal
     - name: openai_batch_data_v5_1_eval
-      response_glob_path: s3://ai2-oe-data/jakep/pdfdata/openai_batch_done_v5_1_eval/*.json
+      response_glob_path:  olmocr/data/evalset/*.json
       target_longest_image_dim: [1024]
       target_anchor_text_len: [6000]
-    - name: openai_batch_data_v5_1_iabooks_eval
-      response_glob_path: s3://ai2-oe-data/jakep/pdfdata/openai_batch_done_v5_1_iabooks_eval/*.json
-      target_longest_image_dim: [1024]
-      target_anchor_text_len: [6000]
+    
 
 
 
@@ -47,10 +41,10 @@ hparams:
   gradient_checkpointing: true
   clip_grad_norm: 1.0
   learning_rate: 1e-6
-  max_steps: 10000
+  max_steps: 100
   pad_multiple_of: 16
-  log_every_steps: 10
-  eval_every_steps: 100
+  log_every_steps: 1
+  eval_every_steps: 1
   optim: adamw_torch
   lr_scheduler: cosine
   weight_decay: 0.01
@@ -58,7 +52,7 @@ hparams:
 
 
 save:
-  path: s3://ai2-oe-data/jakep/experiments/qwen2vl-pdf/v1/models/
-  save_every_steps: 9500
+  path: /content/drive/MyDrive/TrainModel/olmocr
+  save_every_steps: 50
 
 max_workers: 10
