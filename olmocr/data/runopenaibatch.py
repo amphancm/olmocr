@@ -10,6 +10,11 @@ import time
 from openai import OpenAI
 from tqdm import tqdm
 
+import logging
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 # Set up OpenAI client (API key should be set in the environment)
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
@@ -202,6 +207,7 @@ def get_done_total(folder_path):
 #                 # Update the time you checked so you can move onto the next time
 #                 update_state(folder_path, work_item["filename"])
 #         elif work_item["state"] == "processing":
+
 #             batch_data = client.batches.retrieve(work_item["batch_id"])
 
 #             if batch_data.status == "completed":
@@ -313,6 +319,7 @@ def process_folder(folder_path: str, max_gb: int):
 
             elif batch_data.status in ["failed", "expired", "cancelled"]:
                 update_state(folder_path, work_item["filename"], state="errored_out")
+                logger.error(batch_data.errors)
 
                 try:
                     if batch_data.input_file_id:
