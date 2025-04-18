@@ -130,8 +130,11 @@ def is_local(path: str) -> bool:
 
 def copy_file(src: str, dest: str) -> None:
     """Copy a file using shutil.copyfileobj for efficient chunked copying."""
+    # Ensure the destination directory exists
+    os.makedirs(os.path.dirname(dest), exist_ok=True)
+
     with smart_open.open(src, "rb") as src_file, smart_open.open(dest, "wb") as dest_file:
-        copyfileobj(src_file, dest_file)
+        copyfileobj(src_file, dest_file)        
 
 
 def copy_dir(src: str, dst: str, src_fs: Optional[AbstractFileSystem] = None, dst_fs: Optional[AbstractFileSystem] = None):
