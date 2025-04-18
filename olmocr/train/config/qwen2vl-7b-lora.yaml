@@ -70,13 +70,7 @@ lora:
       - visual.merger.mlp.0
       - visual.merger.mlp.2
 
-save:
-<<<<<<< HEAD
-  path: /content/drive/MyDrive/TrainModel/olmocr
-  save_every_steps: 5
-=======
-  path: /content/drive/MyDrive/experiments/qwen2vl-pdf/v1/models/
-  save_every_steps: 10
->>>>>>> 5ab087642f31693583b68ab544a9f60218d020fb
+save:path: s3://ai2-oe-data/jakep/experiments/qwen2vl-pdf/v1/models/
+    save_every_steps: 1
 
 max_workers: 10
