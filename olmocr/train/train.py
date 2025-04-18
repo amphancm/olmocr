@@ -95,6 +95,7 @@ def run_train(config: TrainConfig):
         logger_level = logging.WARN
         disable_progress_bars()
 
+    logger_level = logging.ERROR
     logger = get_logger(__name__, level=logger_level)
     set_verbosity(logger_level)
 
