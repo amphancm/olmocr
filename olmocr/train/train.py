@@ -109,7 +109,7 @@ def run_train(config: TrainConfig):
     logger.info(train_dataset)
     logger.info(valid_dataset)
 
-    if "qwen" in config.model.name_or_path.lower():
+    if "qwen" or "allenai" in config.model.name_or_path.lower():
         model = Qwen2VLForConditionalGeneration.from_pretrained(
             config.model.name_or_path, torch_dtype=torch.bfloat16, _attn_implementation="flash_attention_2" if config.model.use_flash_attn else None
         )
