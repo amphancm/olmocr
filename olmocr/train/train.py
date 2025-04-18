@@ -44,12 +44,16 @@ class CheckpointUploadCallback(TrainerCallback):
         self.logger = logger or get_logger(self.__class__.__name__)
 
     def on_save(self, args: TrainingArguments, state: TrainerState, control: TrainerControl, **kwargs):
+        self.logger.info('on_save')
         if state.is_local_process_zero:
             latest_checkpoint = get_last_checkpoint(args.output_dir)
             if not latest_checkpoint:
                 return
 
+            self.logger.info(self.save_path)
+            
             dir_name = Path(latest_checkpoint).name
+            self.logger.info(dir_name)
             copy_dir(str(latest_checkpoint), f"{self.save_path}/{dir_name}")
             self.logger.info("Saved checkpoint to %s", f"{self.save_path}/{dir_name}")
 
