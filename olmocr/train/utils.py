@@ -86,7 +86,7 @@ def make_dataset(config: TrainConfig, processor: AutoProcessor) -> tuple[Dataset
 
     # Validation sets get put into a datasetdict so each can report a loss separately
     valid_dataset = DatasetDict(
-        **{
+        {
             source.name: get_rawdataset_from_source(config.valid_data, source).with_transform(
                 partial(
                     batch_fn,
