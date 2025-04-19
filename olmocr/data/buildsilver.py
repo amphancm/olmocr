@@ -65,7 +65,7 @@ def build_page_query(local_pdf_path: str, pretty_pdf_path: str, page: int) -> di
         "method": "POST",
         "url": "/v1/chat/completions",
         "body": {
-            "model": "gpt-4o-2024-08-06",
+            "model": "gpt-4.1-mini",
             "messages": [
                 {
                     "role": "user",
