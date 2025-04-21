@@ -16,10 +16,10 @@ import zstandard
 from smart_open import register_compressor, smart_open
 from tqdm import tqdm
 
-from .dolma_refine.aligners import HirschbergAligner
-from .dolma_refine.metrics import DocumentEditSimilarity
-from .dolma_refine.segmenters import SpacySegmenter
-from .evalhtml import create_review_html
+from olmocr.eval.dolma_refine.aligners import HirschbergAligner
+from olmocr.eval.dolma_refine.metrics import DocumentEditSimilarity
+from olmocr.eval.dolma_refine.segmenters import SpacySegmenter
+from olmocr.eval.evalhtml import create_review_html
 
 logging.getLogger("pypdf").setLevel(logging.ERROR)
 
