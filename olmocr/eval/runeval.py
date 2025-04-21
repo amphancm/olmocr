@@ -21,6 +21,10 @@ from olmocr.eval.dolma_refine.metrics import DocumentEditSimilarity
 from olmocr.eval.dolma_refine.segmenters import SpacySegmenter
 from olmocr.eval.evalhtml import create_review_html
 
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 logging.getLogger("pypdf").setLevel(logging.ERROR)
 
 
