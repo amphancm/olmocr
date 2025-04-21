@@ -101,8 +101,11 @@ def create_review_html(data, filename="review_page.html"):
         # Submit tasks to the executor
         futures = [executor.submit(process_entry, i, entry) for i, entry in enumerate(data)]
 
+        logger.info("Create HTML")
+        logger.info(futures)
         # Process the results as they are completed
         for future in tqdm(futures):
+            logger.info(future)
             entries.append(future.result())
 
     # Render the template with the entries
