@@ -11,6 +11,11 @@ from tqdm import tqdm
 
 from olmocr.data.renderpdf import render_pdf_to_base64png
 
+import logging
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 #session = boto3.Session(profile_name="s2")
 #session = boto3.Session()
 #s3_client = session.client("s3")
