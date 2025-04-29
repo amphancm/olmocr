@@ -229,6 +229,7 @@ def create_html_output(random_pages, pdf_s3_client, output_path, workspace_path,
                 --text-light: #6b7280;
                 --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
                 --success-color: #10b981;
+                --overlay-bg: rgba(0, 0, 0, 0.7);
             }}
             
             * {{
@@ -588,6 +589,133 @@ def create_html_output(random_pages, pdf_s3_client, output_path, workspace_path,
                 padding-top: 1rem;
             }}
             
+            /* Instructions Modal */
+            .instructions-modal-overlay {{
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: var(--overlay-bg);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 1000;
+                opacity: 0;
+                visibility: hidden;
+                transition: opacity 0.3s ease, visibility 0.3s ease;
+                backdrop-filter: blur(3px);
+            }}
+            
+            .instructions-modal-overlay.visible {{
+                opacity: 1;
+                visibility: visible;
+            }}
+            
+            .instructions-modal {{
+                background-color: white;
+                border-radius: 8px;
+                width: 90%;
+                max-width: 1000px;
+                max-height: 90vh;
+                overflow-y: auto;
+                padding: 2rem;
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+                position: relative;
+                animation: modalAppear 0.3s ease;
+            }}
+            
+            @keyframes modalAppear {{
+                from {{ 
+                    opacity: 0;
+                    transform: translateY(-20px);
+                }}
+                to {{ 
+                    opacity: 1;
+                    transform: translateY(0);
+                }}
+            }}
+            
+            .instructions-modal-header {{
+                margin-bottom: 1.5rem;
+                text-align: center;
+            }}
+            
+            .instructions-modal-header h2 {{
+                font-size: 1.5rem;
+                color: var(--primary-color);
+                margin-bottom: 0.5rem;
+            }}
+            
+            .instructions-modal-content {{
+                margin-bottom: 2rem;
+                overflow-y: auto;
+                max-height: 60vh;
+                padding-right: 10px;
+                border-radius: 4px;
+                scrollbar-width: thin;
+            }}
+            
+            /* Scrollbar styling for webkit browsers */
+            .instructions-modal-content::-webkit-scrollbar {{
+                width: 8px;
+            }}
+            
+            .instructions-modal-content::-webkit-scrollbar-track {{
+                background: #f1f1f1;
+                border-radius: 10px;
+            }}
+            
+            .instructions-modal-content::-webkit-scrollbar-thumb {{
+                background: #c0c0c0;
+                border-radius: 10px;
+            }}
+            
+            .instructions-modal-content::-webkit-scrollbar-thumb:hover {{
+                background: #a0a0a0;
+            }}
+            
+            /* Styling for the cloned sidebar content in the modal */
+            .instructions-modal-content header {{
+                position: static;
+                min-width: unset;
+                max-width: unset;
+                max-height: unset;
+                overflow-y: visible;
+                padding: 0;
+                background-color: transparent;
+                border-radius: 0;
+                box-shadow: none;
+                align-self: auto;
+                font-size: inherit;
+            }}
+            
+            .instructions-modal-footer {{
+                text-align: center;
+            }}
+            
+            .instructions-modal-button {{
+                padding: 0.75rem 2rem;
+                background-color: var(--primary-color);
+                color: white;
+                border: none;
+                border-radius: 4px;
+                font-size: 1rem;
+                font-weight: 600;
+                cursor: pointer;
+                transition: background-color 0.2s ease;
+            }}
+            
+            .instructions-modal-button:hover {{
+                background-color: #1d4ed8;
+            }}
+            
+            .instructions-modal-button:disabled {{
+                background-color: #9cb3f0;
+                cursor: not-allowed;
+                opacity: 0.7;
+            }}
+            
             @media (max-width: 768px) {{
                 body {{
                     padding: 1rem;
@@ -604,6 +732,11 @@ def create_html_output(random_pages, pdf_s3_client, output_path, workspace_path,
                 .container {{
                     max-width: 100%;
                 }}
+                
+                .instructions-modal {{
+                    padding: 1.5rem;
+                    width: 95%;
+                }}
             }}
         </style>
     </head>
@@ -612,10 +745,13 @@ def create_html_output(random_pages, pdf_s3_client, output_path, workspace_path,
             <h2>Task Overview</h2>
             <p>In this task, you will review {len(random_pages)} document pages and determine whether they contain any <span class="important">Personally Identifiable Information (PII)</span>. For each page, please follow the decision flow outlined in the "How to Annotate" section below.</p>
             <p>Carefully but efficiently inspect each page and select the appropriate response. You do <span class="important">not</span> need to read every word. Instead, focus on ascertaining the document's intended use and spotting information that would qualify as PII.</p>
-            <p>The entire task should take about <span class="important">25-30 minutes</span>.</p>
+            <p>The entire task should take about <span class="important">20-25 minutes</span>.</p>
+            
+            <button id="view-instructions-button" style="background-color: var(--primary-color); color: white; border: none; border-radius: 4px; padding: 0.5rem 1rem; margin: 1rem 0; cursor: pointer;">View Instructions Popup</button>
             
             <h2>How to Annotate</h2>
-            <p>The current annotation will be highlighted with a blue outline and a set of response buttons will be displayed directly below the page preview. For each page, complete the following steps:</p>
+            <p>The current annotation will be highlighted with a blue outline and a set of response buttons will be displayed directly below the page preview. If you are having trouble viewing the displayed page, click the “View Cached PDF” link for a better look. However, <span class="important">DO NOT</span> examine the entire document; <span class="important">ONLY</span> review the single page being previewed (also indicated in the parentheses after “Viewed Cached PDF”).</p>
+            <p>For each page, complete the following steps:</p>
             
             <ol>
                 <li>
@@ -645,6 +781,8 @@ def create_html_output(random_pages, pdf_s3_client, output_path, workspace_path,
                 </li>
             </ol>
             
+            <p><span class="important">Note</span>: If you cannot confidently tell that a page is private, treat it as public and do not mark any PII you are unsure about. We anticipate very few private pages or instances of PII in these documents, so erring towards public and no PII minimizes false positives and keeps the review process consistent.</p>
+            
             <p>You may review and edit your previous annotations at any time. To do so, press the green Edit button directly above the page preview for the annotation you want to edit.</p>
             <p>After completing all {len(random_pages)} document pages, you will receive a Prolific completion code.</p>
             
@@ -653,10 +791,11 @@ def create_html_output(random_pages, pdf_s3_client, output_path, workspace_path,
             <h3 style="color: #3b82f6;">Identifiers for PII</h3>
             <p>Some personal information needs to be accompanied by an <span class="important">identifier</span> to be considered PII. Identifiers that trigger PII include:</p>
             <ul>
-                <li>Names</li>
+                <li>Names (full names, first/last names, maiden names, nicknames, aliases)</li>
                 <li>Email Addresses</li>
                 <li>Phone Numbers</li>
             </ul>
+            <p>Note that the reverse is also true - an identifier must be accompanied by additional personal information or another identifier (e.g., name + email address) to be considered PII.</p>
             <br/>
             
             <h3 style="color: #10b981;">PII that must co-occur with an Identifier</h3>
@@ -671,9 +810,7 @@ def create_html_output(random_pages, pdf_s3_client, output_path, workspace_path,
                     <li>Medical Information (health records, diagnoses, genetic or neural data)</li>
                 </ul>
             </div>
-            
-            <p class="note">Note that some of these items are identifiers themselves.</p>
-            <p><em>Example</em>: A street address might be personal information, but is not PII by itself. However, a street address associated with a name <span class="important">is</span> regulated PII.</p>
+            <p>For example, a street address might be personal information, but is not PII by itself; however, a street address associated with a name <span class="important">is</span> regulated PII.</p>
             
             <br/>
             <h3 style="color: #f59e0b;">PII that occurs even without an Identifier</h3>
@@ -824,7 +961,7 @@ def create_html_output(random_pages, pdf_s3_client, output_path, workspace_path,
                 <div class="error">Error: {str(e)}</div>
                 <div class="annotation-interface{active_class}" data-id="page-{i}" data-pdf-path="{pdf_path}" data-pdf-page="{page_num}">
                     <div class="question-container" id="question1-{i}">
-                        <p class="question-text">Is this document meant for public dissemination?</p>
+                        <p class="question-text">Is this document intended for public release or dissemination?</p>
                         <span class="btn-group">
                             <button type="button" class="toggle-button primary-option" data-value="yes-public" onclick="togglePrimaryOption(this, {i})">Yes</button>
                             <button type="button" class="toggle-button primary-option" data-value="no-public" onclick="togglePrimaryOption(this, {i})">No</button>
@@ -1141,8 +1278,28 @@ def create_html_output(random_pages, pdf_s3_client, output_path, workspace_path,
                 }
             }
             
+            function getQueryParam(name) {
+                const urlParams = new URLSearchParams(window.location.search);
+                return urlParams.get(name);
+            }
+            
             document.addEventListener("DOMContentLoaded", async function() {
+                // Get the datastore
                 const datastore = await fetchDatastore() || {};
+                
+                // Check for PROLIFIC_PID in the URL query parameters
+                const prolificPid = getQueryParam('PROLIFIC_PID');
+                if (prolificPid) {
+                    // If it exists, update the datastore with this value
+                    datastore.prolific_pid = prolificPid;
+                    await putDatastore(datastore);
+                }
+                
+                // Track if instructions have been seen before
+                if (!datastore.hasOwnProperty('instructions_seen')) {
+                    datastore.instructions_seen = false;
+                    await putDatastore(datastore);
+                }
                 
                 // Add editing class to the first container by default
                 const firstContainer = document.querySelector(`.page-container[data-index="0"]`);
@@ -1264,6 +1421,128 @@ def create_html_output(random_pages, pdf_s3_client, output_path, workspace_path,
                     updateStatusIndicators();
                 }
             });
+            
+            // Instructions modal functionality
+            // Create modal container
+            const instructionsModal = document.createElement('div');
+            instructionsModal.className = 'instructions-modal-overlay';
+            instructionsModal.id = 'instructions-modal';
+            
+            // Create modal content container
+            const modalContent = document.createElement('div');
+            modalContent.className = 'instructions-modal';
+            
+            // Create header
+            const modalHeader = document.createElement('div');
+            modalHeader.className = 'instructions-modal-header';
+            modalHeader.innerHTML = `
+                <h2>Welcome to the OLMO OCR Annotation Task</h2>
+                <p>Please read these instructions carefully before you begin.</p>
+            `;
+            
+            // Create content section - will be populated with sidebar content
+            const modalContentSection = document.createElement('div');
+            modalContentSection.className = 'instructions-modal-content';
+            
+            // Clone the sidebar content to reuse in the modal
+            const sidebarContent = document.querySelector('header').cloneNode(true);
+            
+            // Remove the "View Instructions Popup" button from the cloned content
+            const viewInstructionsButton = sidebarContent.querySelector('#view-instructions-button');
+            if (viewInstructionsButton) {
+                viewInstructionsButton.remove();
+            }
+            
+            // Style the sidebar content for use in the modal
+            sidebarContent.style.fontSize = '14px';
+            sidebarContent.style.lineHeight = '1.5';
+            
+            // Append the cloned sidebar content to the modal content section
+            modalContentSection.appendChild(sidebarContent);
+            
+            // Create footer with start button (initially disabled)
+            const modalFooter = document.createElement('div');
+            modalFooter.className = 'instructions-modal-footer';
+            modalFooter.innerHTML = `<button id="start-button" class="instructions-modal-button" disabled>I Understand, Begin Task</button>
+                <p id="scroll-notice" style="margin-top: 10px; font-size: 0.85rem; color: #6b7280;">Please scroll to the bottom to continue</p>`;
+            
+            // Assemble the modal
+            modalContent.appendChild(modalHeader);
+            modalContent.appendChild(modalContentSection);
+            modalContent.appendChild(modalFooter);
+            instructionsModal.appendChild(modalContent);
+            
+            // Track scroll position in instructions and enable button when scrolled to bottom
+            let hasReachedBottom = false;
+            
+            // Function to check if user has scrolled to the bottom of instructions
+            function checkScrollPosition() {
+                const contentSection = modalContentSection;
+                const scrollableContent = contentSection;
+                
+                // Calculate if the user is at the bottom (allowing for small differences)
+                // We consider "bottom" when user has scrolled to at least 90% of the content
+                const scrollPosition = scrollableContent.scrollTop + scrollableContent.clientHeight;
+                const scrollHeight = scrollableContent.scrollHeight;
+                const scrollPercentage = (scrollPosition / scrollHeight) * 100;
+                
+                if (scrollPercentage >= 90 && !hasReachedBottom) {
+                    // User has scrolled to the bottom, enable the button
+                    hasReachedBottom = true;
+                    const startButton = document.getElementById('start-button');
+                    if (startButton) {
+                        startButton.disabled = false;
+                        
+                        // Change the notice text
+                        const scrollNotice = document.getElementById('scroll-notice');
+                        if (scrollNotice) {
+                            scrollNotice.textContent = 'You may now proceed';
+                            scrollNotice.style.color = '#10b981'; // Success color
+                        }
+                    }
+                }
+            }
+            
+            // Add scroll event listener to the modal content
+            modalContentSection.addEventListener('scroll', checkScrollPosition);
+            
+            document.body.appendChild(instructionsModal);
+            
+            // Show the instructions modal when the page loads
+            async function showInstructionsModal() {
+                const datastore = await fetchDatastore() || {};
+                
+                // Check if the task is already completed or instructions have been seen
+                const isTaskCompleted = currentIndex >= totalPages;
+                const instructionsSeen = datastore.instructions_seen === true;
+                
+                // Only show instructions if task is not completed and instructions haven't been seen
+                if (!isTaskCompleted && !instructionsSeen) {
+                    instructionsModal.classList.add('visible');
+                }
+            }
+            
+            // Handle button clicks for instructions modal
+            document.addEventListener('click', async function(event) {
+                // Start button closes the modal and marks instructions as seen
+                if (event.target && event.target.id === 'start-button') {
+                    // Hide the modal
+                    instructionsModal.classList.remove('visible');
+                    
+                    // Update datastore to remember that instructions have been seen
+                    const datastore = await fetchDatastore() || {};
+                    datastore.instructions_seen = true;
+                    await putDatastore(datastore);
+                }
+                
+                // View instructions button shows the modal
+                if (event.target && event.target.id === 'view-instructions-button') {
+                    instructionsModal.classList.add('visible');
+                }
+            });
+            
+            // Show the instructions modal when page loads (after a slight delay)
+            setTimeout(showInstructionsModal, 500);
         </script>
     </body>
     </html>
@@ -1370,11 +1649,16 @@ def process_annotations(annotations_by_link: List[Tuple[Dict[str, Any], str, str
 
     # Process each annotation
     for annotations, link, html_content in annotations_by_link:
+        # Extract Prolific PID from datastore if available
+        prolific_pid = annotations.get("prolific_pid", None)
+
         for page_id, annotation in annotations.items():
-            if not annotation or "primaryOption" not in annotation:
-                results["no_annotation"].append(
-                    {"page_id": page_id, "link": link, "pdf_path": annotation.get("pdfPath", "Unknown") if annotation else "Unknown"}
-                )
+            # Skip non-page entries like prolific_pid
+            if page_id == "prolific_pid":
+                continue
+
+            # Handle case where annotation might be a boolean or non-dict value
+            if not isinstance(annotation, dict) or "primaryOption" not in annotation:
                 continue
 
             primary_option = annotation["primaryOption"]
@@ -1399,7 +1683,16 @@ def process_annotations(annotations_by_link: List[Tuple[Dict[str, Any], str, str
             if primary_option == "yes-public":
                 # Public document - no PII info collected with new flow
                 results["public_document"].append(
-                    {"page_id": page_id, "link": link, "pdf_path": pdf_path, "pdf_page": pdf_page, "pii_types": [], "has_pii": False, "description": ""}
+                    {
+                        "page_id": page_id,
+                        "link": link,
+                        "pdf_path": pdf_path,
+                        "pdf_page": pdf_page,
+                        "pii_types": [],
+                        "has_pii": False,
+                        "description": "",
+                        "prolific_pid": prolific_pid,
+                    }
                 )
 
             elif primary_option == "no-public":
@@ -1410,7 +1703,16 @@ def process_annotations(annotations_by_link: List[Tuple[Dict[str, Any], str, str
                 if not private_pii_options:
                     # No PII selected in a private document
                     results["private_document"].append(
-                        {"page_id": page_id, "link": link, "pdf_path": pdf_path, "pdf_page": pdf_page, "pii_types": [], "has_pii": False, "description": ""}
+                        {
+                            "page_id": page_id,
+                            "link": link,
+                            "pdf_path": pdf_path,
+                            "pdf_page": pdf_page,
+                            "pii_types": [],
+                            "has_pii": False,
+                            "description": "",
+                            "prolific_pid": prolific_pid,
+                        }
                     )
                 else:
                     # PII found in a private document
@@ -1423,17 +1725,18 @@ def process_annotations(annotations_by_link: List[Tuple[Dict[str, Any], str, str
                             "pii_types": private_pii_options,
                             "has_pii": True,
                             "description": other_desc if "other" in private_pii_options else "",
+                            "prolific_pid": prolific_pid,
                         }
                     )
 
             elif primary_option == "cannot-read":
-                results["cannot_read"].append({"page_id": page_id, "link": link, "pdf_path": pdf_path, "pdf_page": pdf_page})
+                results["cannot_read"].append({"page_id": page_id, "link": link, "pdf_path": pdf_path, "pdf_page": pdf_page, "prolific_pid": prolific_pid})
 
             elif primary_option == "report-content":
-                results["report_content"].append({"page_id": page_id, "link": link, "pdf_path": pdf_path, "pdf_page": pdf_page})
+                results["report_content"].append({"page_id": page_id, "link": link, "pdf_path": pdf_path, "pdf_page": pdf_page, "prolific_pid": prolific_pid})
 
             else:
-                results["no_annotation"].append({"page_id": page_id, "link": link, "pdf_path": pdf_path, "pdf_page": pdf_page})
+                results["no_annotation"].append({"page_id": page_id, "link": link, "pdf_path": pdf_path, "pdf_page": pdf_page, "prolific_pid": prolific_pid})
 
     return results
 
@@ -1548,6 +1851,8 @@ def print_annotation_report(annotation_results: Dict[str, List[Dict[str, Any]]],
             print(f"   PII Types: {', '.join(item['pii_types'])}")
             if item.get("description"):
                 print(f"   Description: {item['description']}")
+            if item.get("prolific_pid"):
+                print(f"   Prolific PID: {item['prolific_pid']}")
             print("-" * 80)
 
     print("\nReport complete.")
@@ -1597,7 +1902,7 @@ def read_and_process_results(args):
 
         with open(output_file, "w", newline="") as f:
             writer = csv.writer(f)
-            writer.writerow(["Category", "PDF Path", "Page ID", "Link", "Presigned URL", "Document Type", "PII Types", "Description"])
+            writer.writerow(["Category", "PDF Path", "Page ID", "Link", "Presigned URL", "Document Type", "PII Types", "Description", "Prolific PID"])
 
             for category, items in annotation_results.items():
                 for item in items:
@@ -1628,14 +1933,28 @@ def read_and_process_results(args):
                         pii_types = ""
                         description = ""
 
+                    # Extract Prolific PID from the item if available
+                    prolific_pid = item.get("prolific_pid", "")
+
                     writer.writerow(
-                        [category, item["pdf_path"], item["page_id"], f"{item['link']}#{item['page_id']}", presigned_url, doc_type, pii_types, description]
+                        [
+                            category,
+                            item["pdf_path"],
+                            item["page_id"],
+                            f"{item['link']}#{item['page_id']}",
+                            presigned_url,
+                            doc_type,
+                            pii_types,
+                            description,
+                            prolific_pid,
+                        ]
                     )
 
         print(f"Report saved to {output_file}")
 
     except Exception as e:
         print(f"Error processing results: {e}")
+        raise
 
 
 def main():
