@@ -269,7 +269,7 @@ def process_folder(folder_path: str, max_gb: int):
             time.sleep(0.2)
             continue
 
-        print(f"Processing {os.path.basename(work_item['filename'])}, cur status = {work_item['state']}")
+        print(f"Processing {os.path.basename(work_item['filename'])}, cur status = {work_item['state']}\n")
 
         # If all work items have been checked on, then you need to sleep a bit
         if last_loop_time > datetime.datetime.now() - datetime.timedelta(seconds=1):
@@ -318,6 +318,7 @@ def process_folder(folder_path: str, max_gb: int):
                     print("Could not delete old output data")
 
             elif batch_data.status in ["failed", "expired", "cancelled"]:
+
                 update_state(folder_path, work_item["filename"], state="errored_out")
                 logger.error(batch_data.errors)
 
@@ -328,6 +329,7 @@ def process_folder(folder_path: str, max_gb: int):
                     print(ex)
                     print("Could not delete old input file data")
             else:
+                logger.info(f"else : {batch_data}")
                 update_state(folder_path, work_item["filename"])
 
         last_loop_time = datetime.datetime.now()

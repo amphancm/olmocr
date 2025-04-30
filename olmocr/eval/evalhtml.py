@@ -66,10 +66,11 @@ def process_entry(i, entry):
 
     with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as tmp_pdf:
         pdf_path = tmp_pdf.name
+        logger.info(pdf_path)
         #bucket, key = entry["s3_path"].replace("s3://", "").split("/", 1)
         #s3_client.download_file(bucket, key, pdf_path)
-        page_image_base64 = render_pdf_to_base64png(tmp_pdf.name, entry["page"], target_longest_image_dim=1024)
-
+        #page_image_base64 = render_pdf_to_base64png(tmp_pdf.name, entry["page"], target_longest_image_dim=1024)
+        page_image_base64 = []
     return {
         "entry_id": i,
         "page_image": page_image_base64,
@@ -101,11 +102,11 @@ def create_review_html(data, filename="review_page.html"):
         # Submit tasks to the executor
         futures = [executor.submit(process_entry, i, entry) for i, entry in enumerate(data)]
 
-        logger.info("Create HTML")
-        logger.info(futures)
+        #logger.info("Create HTML")
+        #logger.info(futures)
         # Process the results as they are completed
         for future in tqdm(futures):
-            logger.info(future)
+            #logger.info(future)
             entries.append(future.result())
 
     # Render the template with the entries
