@@ -5,8 +5,8 @@ import os
 
 import boto3
 import torch
-from tqdm import tqdm
 from smart_open import smart_open
+from tqdm import tqdm
 from transformers import Qwen2_5_VLForConditionalGeneration
 
 from olmocr.s3_utils import parse_s3_path
@@ -88,7 +88,7 @@ def main():
 
     # Now, download the config.json from the original path and verify the architectures
     config_path = os.path.join(args.s3_path, "config.json")
-   
+
     with smart_open(config_path, "r") as f:
         config_data = json.load(f)
 
@@ -114,7 +114,6 @@ def main():
         save_model_to_s3(os.path.join(td, "bf16_checkpoint"), bucket, prefix.rstrip("/") + "/bf16")
 
         args.s3_path = args.s3_path.rstrip("/") + "/bf16"
-
 
     print("Model updated successfully.")
 

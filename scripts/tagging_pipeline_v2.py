@@ -71,23 +71,23 @@ metrics = MetricsKeeper(window=60 * 5)
 class PIIClassification(BaseModel):
     primary_language: str = Field(..., description="Primary language as a two-letter code")
     document_type: str = Field(..., description="Basic summary of document type classification")
-    is_resume_cv: Optional[bool] = Field(..., description="True if the document is a page from a resume or cv")
+    is_resume_cv: Optional[bool] = Field(None, description="True if the document is a page from a resume or cv")
 
-    is_academic_paper: Optional[bool]
-    is_textbook: Optional[bool]
-    is_news_article: Optional[bool]
-    is_test_or_quiz: Optional[bool]
-    is_homework_assignment: Optional[bool]
-    is_class_syllabus: Optional[bool]
-    is_meeting_minutes: Optional[bool]
-    is_legal_contract: Optional[bool]
-    is_form: Optional[bool]
-    is_correspondence_or_letter: Optional[bool]
-    is_public_order: Optional[bool]
-    is_court_notice: Optional[bool]
-    is_completion_certificate: Optional[bool]
+    is_academic_paper: Optional[bool] = None
+    is_textbook: Optional[bool] = None
+    is_news_article: Optional[bool] = None
+    is_test_or_quiz: Optional[bool] = None
+    is_homework_assignment: Optional[bool] = None
+    is_class_syllabus: Optional[bool] = None
+    is_meeting_minutes: Optional[bool] = None
+    is_legal_contract: Optional[bool] = None
+    is_form: Optional[bool] = None
+    is_correspondence_or_letter: Optional[bool] = None
+    is_public_order: Optional[bool] = None
+    is_court_notice: Optional[bool] = None
+    is_completion_certificate: Optional[bool] = None
 
-    contains_pii: Optional[bool] = Field(..., description="True if document contains PII")
+    contains_pii: Optional[bool] = Field(None, description="True if document contains PII")
 
 
 async def _process_single_page(page_text: str) -> PIIClassification:
@@ -268,7 +268,7 @@ async def process_dolma_document(args, dolma_doc, sem):
         sample_text = text[:5000]
         text_length = len(text)
         span_end = min(5000, text_length)
-        
+
         # Process the sample with the semaphore to limit concurrent requests
         async with sem:
             pii_class = await _process_single_page(sample_text)
@@ -280,7 +280,7 @@ async def process_dolma_document(args, dolma_doc, sem):
 
             # Create a span from 0 to min(5000, len(text)) with the attribute value
             result_attributes[key_name].append([0, span_end, attribute_value])
-            
+
             # If the document is longer than 5000 characters, add a null span for the rest
             if text_length > 5000:
                 result_attributes[key_name].append([span_end, text_length, None])

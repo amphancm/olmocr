@@ -71,31 +71,31 @@ metrics = MetricsKeeper(window=60 * 5)
 class PIIClassification(BaseModel):
     primary_language: str = Field(..., description="Primary language as a two-letter code")
     document_type: str = Field(..., description="Basic summary of document type classification")
-    is_resume_cv: Optional[bool] = Field(..., description="True if the document is a page from a resume or cv")
-    contains_pii: Optional[bool] = Field(..., description="True if document contains PII")
+    is_resume_cv: Optional[bool] = Field(None, description="True if the document is a page from a resume or cv")
+    contains_pii: Optional[bool] = Field(None, description="True if document contains PII")
 
 
 class RichPIIClassification(BaseModel):
     primary_language: str = Field(..., description="Primary language as a two-letter code")
     document_type: str = Field(..., description="Basic summary of document type classification")
 
-    is_public_document: bool = Field(..., description="True if the document is meant for public dissemination")
+    is_public_document: bool = Field(False, description="True if the document is meant for public dissemination")
 
-    contains_pii_government_id: Optional[bool] = Field(...)
-    contains_pii_financial_info: Optional[bool] = Field(...)
-    contains_pii_biometric_data: Optional[bool] = Field(...)
-    contains_pii_login_info: Optional[bool] = Field(...)
+    contains_pii_government_id: Optional[bool] = Field(None)
+    contains_pii_financial_info: Optional[bool] = Field(None)
+    contains_pii_biometric_data: Optional[bool] = Field(None)
+    contains_pii_login_info: Optional[bool] = Field(None)
 
-    contains_identifier_name: Optional[bool] = Field(..., description="True if the document contains a name")
-    contains_identifier_email: Optional[bool] = Field(..., description="True if the document contains an email address")
-    contains_identifier_phone_number: Optional[bool] = Field(..., description="True if the document contains phone numbers")
+    contains_identifier_name: Optional[bool] = Field(None, description="True if the document contains a name")
+    contains_identifier_email: Optional[bool] = Field(None, description="True if the document contains an email address")
+    contains_identifier_phone_number: Optional[bool] = Field(None, description="True if the document contains phone numbers")
 
-    contains_identifier_with_address: Optional[bool] = Field(...)
-    contains_identifier_with_biographical_info: Optional[bool] = Field(...)
-    contains_identifier_with_location_info: Optional[bool] = Field(...)
-    contains_identifier_with_employment_info: Optional[bool] = Field(...)
-    contains_identifier_with_education_info: Optional[bool] = Field(...)
-    contains_identifier_with_medical_info: Optional[bool] = Field(...)
+    contains_identifier_with_address: Optional[bool] = Field(None)
+    contains_identifier_with_biographical_info: Optional[bool] = Field(None)
+    contains_identifier_with_location_info: Optional[bool] = Field(None)
+    contains_identifier_with_employment_info: Optional[bool] = Field(None)
+    contains_identifier_with_education_info: Optional[bool] = Field(None)
+    contains_identifier_with_medical_info: Optional[bool] = Field(None)
 
     def contains_any_pii(self) -> bool:
         if self.is_public_document:
