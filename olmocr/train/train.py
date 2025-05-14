@@ -8,7 +8,7 @@ from typing import Optional
 import torch
 import torch.distributed
 import wandb
-from datasets.utils import disable_progress_bars
+#from datasets.utils import disable_progress_bars
 from datasets.utils.logging import set_verbosity
 from peft import LoraConfig, get_peft_model  # pyright: ignore
 from transformers import (
