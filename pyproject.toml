@@ -75,7 +75,7 @@ dev = [
     "packaging",
     "necessary",
     "peft",
-    "datasets",
+    "datasets==3.5.1",
     "omegaconf",
     "spacy",
 ]
@@ -98,7 +98,7 @@ train = [
     #"torch",
     #"torchvision",
     "accelerate",
-    "datasets",
+    "datasets==3.5.1",
     "peft",
     "wandb",
     "omegaconf",
