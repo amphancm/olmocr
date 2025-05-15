@@ -43,7 +43,7 @@ hparams:
   max_steps: 200
   pad_multiple_of: 16
   log_every_steps: 1
-  eval_every_steps: 2
+  eval_every_steps: 10
   optim: adamw_torch
   lr_scheduler: cosine
   weight_decay: 0.01
