@@ -208,7 +208,6 @@ class ParagraphEditSimilarity(DocumentEditSimilarity):
         self.sent_window = sent_window
 
     def segment(self, seq_a_tokens: list[str], seq_b_tokens: list[str]) -> list[tuple[list[str], list[str]]]:
-
         all_spans = []
 
         for seq_tokens in (seq_a_tokens, seq_b_tokens):

@@ -37,17 +37,22 @@ Rule expression syntax:
 """
 
 import argparse
+import base64
 import gzip
+import html as pyhtml
 import io
 import json
 import logging
 import os
 from collections import defaultdict
 from enum import Enum, auto
+from io import BytesIO
 from pathlib import Path
 
 import boto3
+import numpy as np
 import zstandard as zstd
+from matplotlib.figure import Figure
 
 # Initialize logger
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -139,6 +144,8 @@ def parse_args():
     parser.add_argument("--aws-profile", help="AWS profile for S3 access")
     parser.add_argument("--recursive", action="store_true", help="Recursively process folder structure")
     parser.add_argument("--debug", action="store_true", help="Enable debug logging for more detailed output")
+    parser.add_argument("--disable-plots", action="store_true", help="Disable CDF plots generation")
+    parser.add_argument("--max-plots", type=int, default=200, help="Maximum number of CDF plots to generate (default: 200)")
     return parser.parse_args()
 
 
@@ -1286,6 +1293,176 @@ def format_rule_stats(rule_stats):
     return "\n".join(formatted_stats)
 
 
+def collect_numeric_attributes(documents):
+    """
+    Collect all numeric attribute values from documents.
+
+    Args:
+        documents: List of documents with attributes
+
+    Returns:
+        Dictionary mapping attribute names to lists of numeric values
+    """
+    numeric_attributes = defaultdict(list)
+
+    for doc in documents:
+        if "attributes" not in doc or not doc["attributes"]:
+            continue
+
+        for attr_name, attr_values in doc["attributes"].items():
+            if not attr_values:
+                continue
+
+            # Try to extract numeric values from the attribute spans
+            # Each span is formatted as [start_pos, end_pos, value]
+            for span in attr_values:
+                if len(span) >= 3 and span[2] is not None:
+                    try:
+                        # Convert to float if it's a numeric value
+                        value = float(span[2])
+                        numeric_attributes[attr_name].append(value)
+                    except (ValueError, TypeError):
+                        # Not a numeric value, skip
+                        pass
+
+    # Filter out attributes with no or too few numeric values
+    return {k: v for k, v in numeric_attributes.items() if len(v) > 5}
+
+
+def generate_cdf_plot(values, attribute_name):
+    """
+    Generate a CDF plot for the given numeric values.
+
+    Args:
+        values: List of numeric values
+        attribute_name: Name of the attribute (for plot title)
+
+    Returns:
+        Base64-encoded PNG image of the plot or None if there's an error
+    """
+    try:
+        # Ensure we have enough data points
+        if len(values) < 5:
+            logger.warning(f"Not enough data points to generate CDF for {attribute_name}")
+            return None
+
+        # Remove any NaN or infinite values
+        values = np.array([v for v in values if np.isfinite(v)])
+        if len(values) < 5:
+            logger.warning(f"Not enough finite data points to generate CDF for {attribute_name}")
+            return None
+
+        # Handle extreme values by removing outliers (optional)
+        # if len(values) > 30:  # Only apply if we have enough data points
+        #     q1, q3 = np.percentile(values, [25, 75])
+        #     iqr = q3 - q1
+        #     lower_bound = q1 - 3 * iqr
+        #     upper_bound = q3 + 3 * iqr
+        #     values = values[(values >= lower_bound) & (values <= upper_bound)]
+
+        # Sort values for CDF calculation
+        values = np.sort(values)
+
+        # Create a Figure object (no interactive display)
+        fig = Figure(figsize=(10, 6))
+        ax = fig.add_subplot(1, 1, 1)
+
+        # Calculate CDF (y-values are 0 to 1 for cumulative probability)
+        y = np.arange(1, len(values) + 1) / len(values)
+
+        # Plot the CDF
+        ax.plot(values, y, "b-", linewidth=2)
+        ax.grid(True, linestyle="--", alpha=0.7)
+
+        # Add labels and title
+        ax.set_xlabel("Value", fontsize=12)
+        ax.set_ylabel("Cumulative Probability", fontsize=12)
+        ax.set_title(f"CDF of {attribute_name}", fontsize=14)
+
+        # Ensure the y-axis goes from 0 to 1 for probability
+        ax.set_ylim(0, 1.05)
+
+        # Add some statistics to the plot
+        if len(values) > 0:
+            mean_val = np.mean(values)
+            median_val = np.median(values)
+            min_val = np.min(values)
+            max_val = np.max(values)
+            stats_text = f"n={len(values)}\nmin={min_val:.2f}\nmax={max_val:.2f}\nmean={mean_val:.2f}\nmedian={median_val:.2f}"
+            ax.text(0.02, 0.98, stats_text, transform=ax.transAxes, verticalalignment="top", bbox=dict(boxstyle="round", facecolor="white", alpha=0.8))
+
+        # Make layout tight
+        fig.tight_layout()
+
+        # Convert to base64 for embedding in HTML
+        buf = BytesIO()
+        fig.savefig(buf, format="png", dpi=100)
+        buf.seek(0)
+        img_base64 = base64.b64encode(buf.getvalue()).decode("utf-8")
+
+        return img_base64
+
+    except Exception as e:
+        logger.error(f"Error generating CDF plot for {attribute_name}: {e}")
+        return None
+
+
+def generate_attribute_plots_html(numeric_attributes, max_plots=20):
+    """
+    Generate HTML section with CDF plots for all numeric attributes.
+
+    Args:
+        numeric_attributes: Dictionary mapping attribute names to lists of numeric values
+        max_plots: Maximum number of plots to generate
+
+    Returns:
+        HTML string with embedded CDF plots
+    """
+    if not numeric_attributes:
+        return ""
+
+    html = """
+    <h2>Numeric Attribute Distributions</h2>
+    <div class="attribute-plots">
+    """
+
+    plot_count = 0
+
+    # Sort attributes by number of values (most values first)
+    sorted_attrs = sorted(numeric_attributes.items(), key=lambda x: len(x[1]), reverse=True)
+
+    for attr_name, values in sorted_attrs:
+        if len(values) < 10:  # Skip attributes with too few values for meaningful plots
+            continue
+
+        if plot_count >= max_plots:
+            logger.info(f"Limiting CDF plots to {max_plots} attributes to avoid performance issues")
+            break
+
+        # Generate the CDF plot
+        img_base64 = generate_cdf_plot(values, attr_name)
+
+        # Only add to HTML if plot generation was successful
+        if img_base64:
+            html += f"""
+            <div class="plot-container">
+                <h3>{attr_name}</h3>
+                <img src="data:image/png;base64,{img_base64}" alt="CDF plot for {attr_name}" class="cdf-plot">
+                <p>Number of values: {len(values)}</p>
+            </div>
+            """
+            plot_count += 1
+
+    if plot_count == 0:
+        return ""  # Don't add the section if no plots were generated
+
+    html += """
+    </div>
+    """
+
+    return html
+
+
 def generate_html_report(docs, title, summary, output_path):
     """
     Generate an HTML report file with document texts
@@ -1482,7 +1659,7 @@ def generate_html_report(docs, title, summary, output_path):
         html += f"""
             <div id="doc-{i}" class="document{selected_class}" tabindex="0">
                 <div class="document-id">Document ID: {doc_id}</div>
-                <div class="document-text">{doc_text}</div>
+                <pre class="document-text">{pyhtml.escape(doc_text)}</pre>
             </div>
 """
 
@@ -1735,15 +1912,20 @@ IoU: {iou:.4f}
 
     # True Positives
     generate_html_report(
-        true_positives, "True Positives - Documents matching both Reference and Hypothesis Rules", summary, os.path.join(args.output_dir, "true_positives.html")
+        true_positives[:1000],
+        "True Positives - Documents matching both Reference and Hypothesis Rules",
+        summary,
+        os.path.join(args.output_dir, "true_positives.html"),
     )
 
     # True Negatives
-    generate_html_report(true_negatives, "True Negatives - Documents not matching either Rule", summary, os.path.join(args.output_dir, "true_negatives.html"))
+    generate_html_report(
+        true_negatives[:1000], "True Negatives - Documents not matching either Rule", summary, os.path.join(args.output_dir, "true_negatives.html")
+    )
 
     # False Positives
     generate_html_report(
-        false_positives,
+        false_positives[:1000],
         "False Positives - Documents matching Hypothesis but not Reference Rule",
         summary,
         os.path.join(args.output_dir, "false_positives.html"),
@@ -1751,11 +1933,26 @@ IoU: {iou:.4f}
 
     # False Negatives
     generate_html_report(
-        false_negatives,
+        false_negatives[:1000],
         "False Negatives - Documents matching Reference but not Hypothesis Rule",
         summary,
         os.path.join(args.output_dir, "false_negatives.html"),
     )
+
+    # Collect numeric attributes and generate CDF plots if not disabled
+    attribute_plots_html = ""
+    if not args.disable_plots:
+        logger.info("Collecting numeric attributes for CDF plots...")
+        numeric_attributes = collect_numeric_attributes(all_docs)
+
+        if numeric_attributes:
+            logger.info(f"Found {len(numeric_attributes)} numeric attributes suitable for CDF plots")
+            # Generate CDF plots HTML with the specified maximum number of plots
+            attribute_plots_html = generate_attribute_plots_html(numeric_attributes, args.max_plots)
+        else:
+            logger.info("No numeric attributes found for CDF plots")
+    else:
+        logger.info("CDF plot generation disabled by --disable-plots flag")
 
     # Generate index.html file that links to all reports
     index_html = f"""<!DOCTYPE html>
@@ -1769,7 +1966,7 @@ IoU: {iou:.4f}
             line-height: 1.6;
             margin: 0;
             padding: 20px;
-            max-width: 800px;
+            max-width: 1000px;
             margin: 0 auto;
         }}
         .summary {{
@@ -1813,6 +2010,29 @@ IoU: {iou:.4f}
         a:hover {{
             text-decoration: underline;
         }}
+        .attribute-plots {{
+            margin-top: 30px;
+        }}
+        .plot-container {{
+            margin-bottom: 30px;
+            padding: 15px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }}
+        .cdf-plot {{
+            max-width: 100%;
+            height: auto;
+        }}
+        h2 {{
+            color: #333;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+            margin-top: 30px;
+        }}
+        h3 {{
+            color: #007bff;
+        }}
     </style>
 </head>
 <body>
@@ -1842,6 +2062,8 @@ IoU: {iou:.4f}
         <p>Documents that match the reference rule but not the hypothesis rule.</p>
         <a href="false_negatives.html">View False Negatives</a>
     </div>
+    
+    {attribute_plots_html}
 </body>
 </html>
 """
@@ -1878,6 +2100,20 @@ IoU: {iou:.4f}
     logger.info(f"Recall: {recall:.4f}")
     logger.info(f"F1 Score: {f1:.4f}")
     logger.info(f"IoU: {iou:.4f}")
+
+    # Output all available attributes that have been loaded
+    logger.info("\n--- AVAILABLE ATTRIBUTES ---")
+    all_attributes = set()
+    for doc in all_docs:
+        if "attributes" in doc and doc["attributes"]:
+            all_attributes.update(doc["attributes"].keys())
+
+    if all_attributes:
+        logger.info(f"Found {len(all_attributes)} unique attributes:")
+        for attr in sorted(all_attributes):
+            logger.info(f"  - {attr}")
+    else:
+        logger.info("No attributes found in any documents.")
 
     logger.info(f"\nResults saved to: {args.output_dir}/index.html")
 

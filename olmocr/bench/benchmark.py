@@ -20,7 +20,6 @@ import random
 import re
 import sys
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from itertools import combinations
 from typing import Dict, List, Tuple
 
 from pypdf import PdfReader
@@ -28,7 +27,7 @@ from tqdm import tqdm
 
 from .report import generate_html_report
 from .tests import BaselineTest, BasePDFTest, load_tests, save_tests
-from .utils import calculate_bootstrap_ci, perform_permutation_test
+from .utils import calculate_bootstrap_ci
 
 
 def evaluate_candidate(
@@ -186,16 +185,6 @@ def main():
         default=0.95,
         help="Confidence level for interval calculation (default: 0.95 for 95% CI).",
     )
-    parser.add_argument(
-        "--permutation_tests",
-        nargs="?",
-        const="default",
-        help=(
-            "Run permutation testing. If provided without candidate names, run default tests. "
-            "If provided with a comma-separated list of candidate names (e.g. --permutation_tests asdf,qwe,ert), "
-            "run permutation tests on all pairs of the specified candidates."
-        ),
-    )
     # New arguments
     parser.add_argument("--sample", type=int, default=None, help="Randomly sample N tests to run instead of all tests.")
     parser.add_argument("--test_report", type=str, default=None, help="Generate an HTML report of test results. Provide a filename (e.g., results.html).")
@@ -296,8 +285,43 @@ def main():
         # Always store test results for displaying jsonl file groupings
         test_results_by_candidate[candidate_name] = test_results
 
-        if all_test_scores:
-            ci = calculate_bootstrap_ci(all_test_scores, n_bootstrap=n_bootstrap, ci_level=ci_level)
+        # Group results by jsonl file for more accurate CI calculation
+        jsonl_results = {}
+        jsonl_scores = []  # List to store scores by jsonl file for CI calculation
+        jsonl_file_sizes = []  # List to store the number of tests per jsonl file
+
+        for test in all_tests:
+            # Get the jsonl file this test came from
+            jsonl_file = test_to_jsonl.get(test.id, "unknown")
+
+            if jsonl_file not in jsonl_results:
+                jsonl_results[jsonl_file] = {"total": 0, "passed": 0, "scores": []}
+
+            jsonl_results[jsonl_file]["total"] += 1
+
+            # Get the test result for this candidate if it exists
+            if not candidate_errors and hasattr(test, "pdf") and hasattr(test, "page"):
+                pdf_name = test.pdf
+                page = test.page
+                if pdf_name in test_results and page in test_results.get(pdf_name, {}):
+                    for t, passed, _ in test_results[pdf_name][page]:
+                        if t.id == test.id:
+                            # Store the test score in its jsonl group
+                            result_score = 1.0 if passed else 0.0
+                            jsonl_results[jsonl_file]["scores"].append(result_score)
+                            if passed:
+                                jsonl_results[jsonl_file]["passed"] += 1
+                            break
+
+        # Gather all the scores by jsonl file for CI calculation
+        for jsonl_file, results in jsonl_results.items():
+            if results["scores"]:
+                jsonl_file_sizes.append(len(results["scores"]))
+                jsonl_scores.extend(results["scores"])
+
+        # Calculate CI using the updated function with splits
+        if jsonl_scores:
+            ci = calculate_bootstrap_ci(jsonl_scores, n_bootstrap=n_bootstrap, ci_level=ci_level, splits=jsonl_file_sizes)
         else:
             ci = (0.0, 0.0)
         summary.append((candidate_name, overall_score, total_tests, candidate_errors, test_failures, test_type_breakdown, ci, all_test_scores))
@@ -309,9 +333,15 @@ def main():
             if test_failures:
                 for fail in test_failures:
                     print(f"  [FAIL] {fail}")
-            # Note: This score is still the average over all tests and will be updated to
-            # the average of per-JSONL file scores in the final summary
-            print(f"  Average Score: {overall_score * 100:.1f}% (95% CI: [{ci[0] * 100:.1f}%, {ci[1] * 100:.1f}%]) over {total_tests} tests.")
+            # Calculate and show the per-category average score
+            jsonl_pass_rates = []
+            for _, results in jsonl_results.items():
+                if results["total"] > 0:
+                    pass_rate = results["passed"] / results["total"]
+                    jsonl_pass_rates.append(pass_rate)
+
+            per_category_score = sum(jsonl_pass_rates) / len(jsonl_pass_rates) if jsonl_pass_rates else 0.0
+            print(f"  Average Score: {per_category_score * 100:.1f}% (95% CI: [{ci[0] * 100:.1f}%, {ci[1] * 100:.1f}%]) over {total_tests} tests.")
 
     print("\n" + "=" * 60)
     print("Final Summary with 95% Confidence Intervals:")
@@ -359,8 +389,7 @@ def main():
             ciw_str = ""
         else:
             status = f"{new_overall_score * 100:0.1f}%"
-            # Note: CI calculation would need to be updated too for full accuracy,
-            # but keeping as-is for now as it would require deeper changes
+            # Use the CI that was calculated with proper category-based bootstrap
             half_width = ((ci[1] - ci[0]) / 2) * 100
             ciw_str = f"± {half_width:0.1f}%"
         print(f"{candidate_name:20s} : Average Score: {status} {ciw_str} (average of per-JSONL scores)")
@@ -377,62 +406,6 @@ def main():
                 pass_rate = (results["passed"] / results["total"]) * 100
                 print(f"        {jsonl_file:30s}: {pass_rate:0.1f}% ({results['passed']}/{results['total']} tests)")
         print("")
-
-    if args.permutation_tests is not None:
-        print("\n" + "=" * 60)
-        print("Pairwise Permutation Tests:")
-        valid_candidates = [c for c in summary if not c[3]]
-        if args.permutation_tests == "default":
-            olmocr_candidates = sorted([c for c in valid_candidates if "olmocr" in c[0].lower()], key=lambda x: x[1], reverse=True)
-            non_olmocr_candidates = sorted([c for c in valid_candidates if "olmocr" not in c[0].lower()], key=lambda x: x[1], reverse=True)
-            top_olmocr = olmocr_candidates[0] if olmocr_candidates else None
-            top_non_olmocr = non_olmocr_candidates[0] if non_olmocr_candidates else None
-            top_two_olmocr = olmocr_candidates[:2]
-
-            if top_olmocr and top_non_olmocr:
-                olmocr_name, olmocr_score = top_olmocr[0], top_olmocr[1]
-                non_olmocr_name, non_olmocr_score = top_non_olmocr[0], top_non_olmocr[1]
-                diff, p_value = perform_permutation_test(top_olmocr[7], top_non_olmocr[7])
-                print("\nComparison 1: Top olmocr vs Top non-olmocr candidate")
-                print(f"  {olmocr_name} ({olmocr_score*100:.1f}%) vs {non_olmocr_name} ({non_olmocr_score*100:.1f}%)")
-                print(f"  Difference: {diff*100:.2f}% (positive means {olmocr_name} is better)")
-                print(f"  p-value: {p_value:.4f}")
-                if p_value < 0.05:
-                    print("  Result: Statistically significant difference (p < 0.05)")
-                else:
-                    print("  Result: No statistically significant difference (p ≥ 0.05)")
-            else:
-                print("\nCannot perform olmocr vs non-olmocr comparison: Missing candidates")
-
-            if len(top_two_olmocr) >= 2:
-                diff, p_value = perform_permutation_test(top_two_olmocr[0][7], top_two_olmocr[1][7])
-                print("\nComparison 2: Top two olmocr candidates")
-                print(f"  {top_two_olmocr[0][0]} ({top_two_olmocr[0][1]*100:.1f}%) vs {top_two_olmocr[1][0]} ({top_two_olmocr[1][1]*100:.1f}%)")
-                print(f"  Difference: {diff*100:.2f}% (positive means {top_two_olmocr[0][0]} is better)")
-                print(f"  p-value: {p_value:.4f}")
-                if p_value < 0.05:
-                    print("  Result: Statistically significant difference (p < 0.05)")
-                else:
-                    print("  Result: No statistically significant difference (p ≥ 0.05)")
-            else:
-                print("\nCannot perform top two olmocr comparison: Not enough olmocr candidates")
-        else:
-            candidate_names = [name.strip() for name in args.permutation_tests.split(",")]
-            selected_candidates = [c for c in valid_candidates if c[0] in candidate_names]
-            if len(selected_candidates) < 2:
-                print("\nNot enough valid candidates among the selected for permutation tests.")
-            else:
-                for cand1, cand2 in combinations(selected_candidates, 2):
-                    diff, p_value = perform_permutation_test(cand1[7], cand2[7])
-                    print(f"\nComparison: {cand1[0]} vs {cand2[0]}")
-                    print(f"  {cand1[0]} ({cand1[1]*100:.1f}%) vs {cand2[0]} ({cand2[1]*100:.1f}%)")
-                    print(f"  Difference: {diff*100:.2f}% (positive means {cand1[0]} is better)")
-                    print(f"  p-value: {p_value:.4f}")
-                    if p_value < 0.05:
-                        print("  Result: Statistically significant difference (p < 0.05)")
-                    else:
-                        print("  Result: No statistically significant difference (p ≥ 0.05)")
-        print("=" * 60)
 
     # Generate HTML report if requested
     if args.test_report:

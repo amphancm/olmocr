@@ -138,8 +138,8 @@ async def build_page_query(local_pdf_path: str, page: int, target_longest_image_
             {
                 "role": "user",
                 "content": [
-                    {"type": "text", "text": build_finetuning_prompt(anchor_text)},
                     {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{image_base64}"}},
+                    {"type": "text", "text": build_finetuning_prompt(anchor_text)},
                 ],
             }
         ],
@@ -474,15 +474,67 @@ async def worker(args, work_queue: WorkQueue, semaphore, worker_id):
                     tf.write(json.dumps(doc))
                     tf.write("\n")
                 tf.flush()
+                temp_path = tf.name
 
+            try:
                 # Define the output S3 path using the work_hash
                 output_final_path = os.path.join(args.workspace, "results", f"output_{work_item.hash}.jsonl")
 
                 if output_final_path.startswith("s3://"):
                     bucket, key = parse_s3_path(output_final_path)
-                    workspace_s3.upload_file(tf.name, bucket, key)
+                    workspace_s3.upload_file(temp_path, bucket, key)
                 else:
-                    shutil.copyfile(tf.name, output_final_path)
+                    shutil.copyfile(temp_path, output_final_path)
+            finally:
+                # Clean up the temporary file
+                if os.path.exists(temp_path):
+                    os.unlink(temp_path)
+
+            # If --markdown flag is set, also write the natural text to markdown files
+            if args.markdown:
+                logger.info(f"Writing {len(dolma_docs)} markdown files for {work_item.hash}")
+                for doc in dolma_docs:
+                    source_file = doc["metadata"]["Source-File"]
+                    natural_text = doc["text"]
+
+                    # Create the output markdown path that preserves the folder structure
+                    if source_file.startswith("s3://"):
+                        # Extract the path after the bucket name for S3 sources
+                        parsed = urlparse(source_file)
+                        relative_path = parsed.path.lstrip("/")
+                    else:
+                        # For local files, use the full path
+                        relative_path = source_file
+
+                    # Change the extension to .md
+                    md_filename = os.path.splitext(os.path.basename(relative_path))[0] + ".md"
+                    # Get the directory path without the filename
+                    dir_path = os.path.dirname(relative_path)
+
+                    # Create the output markdown path
+                    markdown_dir = os.path.join(args.workspace, "markdown", dir_path)
+                    markdown_path = os.path.join(markdown_dir, md_filename)
+
+                    # Create the directory structure if it doesn't exist
+                    if markdown_path.startswith("s3://"):
+                        # For S3 paths, we'll create a temporary file and upload it
+                        with tempfile.NamedTemporaryFile(mode="w+", delete=False) as md_tf:
+                            md_tf.write(natural_text)
+                            md_tf.flush()
+                            md_temp_path = md_tf.name
+
+                        try:
+                            md_bucket, md_key = parse_s3_path(markdown_path)
+                            workspace_s3.upload_file(md_temp_path, md_bucket, md_key)
+                        finally:
+                            # Make sure to clean up the temporary file even if upload fails
+                            if os.path.exists(md_temp_path):
+                                os.unlink(md_temp_path)
+                    else:
+                        # For local paths, create the directory structure and write the file
+                        os.makedirs(markdown_dir, exist_ok=True)
+                        with open(markdown_path, "w") as md_f:
+                            md_f.write(natural_text)
 
             # Update finished token counts from successful documents
             metrics.add_metrics(
@@ -924,6 +976,7 @@ async def main():
     parser.add_argument("--workers", type=int, default=8, help="Number of workers to run at a time")
     parser.add_argument("--apply_filter", action="store_true", help="Apply basic filtering to English pdfs which are not forms, and not likely seo spam")
     parser.add_argument("--stats", action="store_true", help="Instead of running any job, reports some statistics about the current workspace")
+    parser.add_argument("--markdown", action="store_true", help="Also write natural text to markdown files preserving the folder structure of the input pdfs")
 
     # Model parameters
     parser.add_argument(

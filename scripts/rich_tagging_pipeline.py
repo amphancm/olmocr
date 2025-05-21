@@ -26,9 +26,7 @@ import zstandard as zstd
 from huggingface_hub import snapshot_download
 from pydantic import BaseModel, Field, ValidationError
 
-from olmocr.check import (
-    check_torch_gpu_available,
-)
+from olmocr.check import check_torch_gpu_available
 from olmocr.metrics import MetricsKeeper
 from olmocr.s3_utils import (
     download_directory,
