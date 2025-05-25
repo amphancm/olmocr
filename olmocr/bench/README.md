@@ -231,7 +231,7 @@ $ 3x^2 $ to appear on a page, then outputting $ \int_a^b{ 3x ^ 2dx} $ counts.
   first article appears after the heading of that article. But, you may be okay with swapping the order of those 
   two articles.
 - Table Accuracy
-  - Both Markdown and HTML based tables are supported. These tests check that a cell with a given text exists somewhere in the table, and that its neighbors have certain properties. Ex. A cell exists on this page with text "4.5%" and above that is a cell with the text "2.4%"
+  - Both Markdown and HTML based tables are supported. These tests check that a cell with a given text exists somewhere in the table, and that its neighbors have certain properties. Ex. A cell exists on this page with text "4.5%" and above that is a cell with the text "2.4%". However, it's important to note that some tests depend on rowspan and colspan information being present in the table, which is only available with HTML based tables. This means that a model outputting only markdown tables cannot achieve a max score on this section.
 - Math Formula Accuracy
   - We render a given Latex style equation using Katex in a headless browser. And then see if it exists anywhere in the final OCRed document. Matching is performed on a relative symbol level, ex. in "\f\relax{x} = \int_{-\infty}^\infty
     x^2dx" we check that a ∫ appears to the left of a x, x appears to the left of dx, etc...
@@ -263,6 +263,9 @@ huggingface-cli download --repo-type dataset --resume-download allenai/olmOCR-be
 
 Convert your documents
 ```bash
+# You will need to install the [gpu] subset of olmocr dependencies to run gpu inference
+pip install olmocr[gpu] --find-links https://flashinfer.ai/whl/cu124/torch2.4/flashinfer/
+
 # convert using the same engine as olmOCR pipeline.py uses, see the olmocr/bench/runners directory for options
 python -m olmocr.bench.convert olmocr_pipeline --dir ./olmOCR-bench/bench_data
 

@@ -35,6 +35,7 @@ Features:
  - (Based on a 7B parameter VLM, so it requires a GPU)
 
 ### News
+ - May 23, 2025 - v0.1.70 - Official docker support and images are now available! [See Docker usage](#using-docker)
  - May 19, 2025 - v0.1.68 - [olmOCR-Bench](https://github.com/allenai/olmocr/tree/main/olmocr/bench) launch, scoring 77.4. Launch includes 2 point performance boost in olmOCR pipeline due to bug fixes with prompts.
  - Mar 17, 2025 - v0.1.60 - Performance improvements due to better temperature selection in sampling.
  - Feb 25, 2025 - v0.1.58 -  Initial public launch and demo.
@@ -172,11 +173,10 @@ The `./localworkspace/` workspace folder will then have both [Dolma](https://git
 cat localworkspace/markdown/olmocr-sample.md 
 ```
 
-<pre>
+```
 olmOCR: Unlocking Trillions of Tokens in PDFs with Vision Language Models
 ...
-</pre>
-
+```
 
 ### Multi-node / Cluster Usage
 
@@ -203,6 +203,35 @@ For example:
 ```bash
 python -m olmocr.pipeline s3://my_s3_bucket/pdfworkspaces/exampleworkspace --pdfs s3://my_s3_bucket/jakep/gnarly_pdfs/*.pdf --beaker --beaker_gpus 4
 ```
+
+### Using Docker
+
+Pull the Docker image.
+```bash
+docker pull alleninstituteforai/olmocr:latest
+```
+
+To run the container interactively:
+```bash
+docker run -it --gpus all --name olmocr_container alleninstituteforai/olmocr:latest /bin/bash
+```
+
+If you want to access your local files inside the container, use volume mounting:
+```bash
+docker run -it --gpus all \
+  -v /path/to/your/local/files:/local_files \
+  --name olmocr_container \
+  alleninstituteforai/olmocr:latest /bin/bash
+```
+
+All dependencies are already installed. Once you’re inside the container, you can run olmOCR commands. For example:
+
+```bash
+curl -o olmocr-sample.pdf https://olmocr.allenai.org/papers/olmocr_3pg_sample.pdf
+
+python -m olmocr.pipeline ./localworkspace --markdown --pdfs olmocr-sample.pdf
+```
+> You can also visit our Docker repository on [Docker Hub](https://hub.docker.com/r/alleninstituteforai/olmocr).
 
 ### Full documentation for the pipeline
 
@@ -267,6 +296,8 @@ There are some nice reusable pieces of the code that may be useful for your own 
  - Finetuning code for Qwen2-VL and Molmo-O - [train.py](https://github.com/allenai/olmocr/blob/main/olmocr/train/train.py)
  - Processing millions of PDFs through a finetuned model using Sglang - [pipeline.py](https://github.com/allenai/olmocr/blob/main/olmocr/pipeline.py)
  - Viewing [Dolma docs](https://github.com/allenai/dolma) created from PDFs - [dolmaviewer.py](https://github.com/allenai/olmocr/blob/main/olmocr/viewer/dolmaviewer.py)
+
+
 
 ## Team
 
