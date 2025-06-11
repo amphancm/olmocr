@@ -982,7 +982,7 @@ async def main():
     )
     parser.add_argument("--workspace_profile", help="S3 configuration profile for accessing the workspace", default=None)
     parser.add_argument("--pdf_profile", help="S3 configuration profile for accessing the raw pdf documents", default=None)
-    parser.add_argument("--pages_per_group", type=int, default=500, help="Aiming for this many pdf pages per work item group")
+    parser.add_argument("--pages_per_group", type=int, default=100, help="Aiming for this many pdf pages per work item group")
     parser.add_argument("--max_page_retries", type=int, default=8, help="Max number of times we will retry rendering a page")
     parser.add_argument("--max_page_error_rate", type=float, default=0.004, help="Rate of allowable failed pages in a document, 1/250 by default")
     parser.add_argument("--workers", type=int, default=8, help="Number of workers to run at a time")
@@ -1094,9 +1094,9 @@ async def main():
         logger.info(f"Found {len(pdf_work_paths):,} total pdf paths to add")
 
         # Estimate average pages per pdf
-        sample_size = min(100, len(pdf_work_paths))
+        sample_size  = min(100, len(pdf_work_paths))
         sampled_pdfs = random.sample(list(pdf_work_paths), sample_size)
-        page_counts = []
+        page_counts  = []
 
         for pdf in tqdm(sampled_pdfs, desc="Sampling PDFs to calculate optimal length"):
             try:
