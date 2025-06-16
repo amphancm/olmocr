@@ -55,7 +55,9 @@ def make_dataset(config: TrainConfig, processor: AutoProcessor) -> tuple[Dataset
     elif "allenai" in config.model.name_or_path.lower():
         batch_fn = batch_prepare_data_for_qwen2_training
     elif "scb10x" in config.model.name_or_path.lower():
-        batch_fn = batch_prepare_data_for_qwen2_training        
+        batch_fn = batch_prepare_data_for_qwen2_training
+    elif "Adun" in config.model.name_or_path.lower():
+        batch_fn = batch_prepare_data_for_qwen2_training           
     elif "molmo" in config.model.name_or_path.lower():
         batch_fn = batch_prepare_data_for_molmo_training
     else:
