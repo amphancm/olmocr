@@ -1,5 +1,5 @@
 model:
-  name_or_path: allenai/olmOCR-7B-0225-preview
+  name_or_path: Adun/olmOCR-7B-thai-v2
   arch: causal
   use_flash_attn: true
 

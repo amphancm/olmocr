@@ -13,8 +13,8 @@ from datasets.utils.logging import set_verbosity
 from peft import LoraConfig, get_peft_model  
 from transformers import (
     AutoProcessor,
-    #Qwen2VLForConditionalGeneration,
-    Qwen2_5_VLForConditionalGeneration,
+    Qwen2VLForConditionalGeneration,
+    #Qwen2_5_VLForConditionalGeneration,
     Trainer,
     TrainerCallback,
     TrainingArguments,
@@ -110,9 +110,9 @@ def run_train(config: TrainConfig):
     logger.info(train_dataset)
     logger.info(valid_dataset)
 
-    if "qwen" or "allenai" or "scb10x" in config.model.name_or_path.lower():
-        #model = Qwen2VLForConditionalGeneration.from_pretrained(
-        model = Qwen2_5_VLForConditionalGeneration.from_pretrained(    
+    if "qwen" or "allenai" or "Adun" in config.model.name_or_path.lower():
+        #model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
+        model = Qwen2VLForConditionalGeneration.from_pretrained(
             config.model.name_or_path, torch_dtype=torch.bfloat16, _attn_implementation="flash_attention_2" if config.model.use_flash_attn else None
         )
     else:
