@@ -402,8 +402,8 @@ async def process_pdf(args, worker_id: int, pdf_orig_path: str):
 
 def build_dolma_document(pdf_orig_path, page_results):
     # Build the document text and page spans
-    document_text = ""
-    pdf_page_spans = []
+    document_text    = ""
+    pdf_page_spans   = []
     current_char_pos = 0
 
     for index, page_result in enumerate(page_results):
