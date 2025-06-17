@@ -329,7 +329,7 @@ async def process_page(args, worker_id: int, pdf_orig_path: str, pdf_local_path:
 
 
 async def process_pdf(args, worker_id: int, pdf_orig_path: str):
-    with tempfile.NamedTemporaryFile("wb+", suffix=".pdf") as tf:
+    with tempfile.NamedTemporaryFile("wb+", suffix=".pdf", delete=False) as tf:
         try:
             data = await asyncio.to_thread(lambda: get_s3_bytes_with_backoff(pdf_s3, pdf_orig_path))
             tf.write(data)
@@ -347,6 +347,7 @@ async def process_pdf(args, worker_id: int, pdf_orig_path: str):
             tf.write(convert_image_to_pdf_bytes(tf.name))
             tf.flush()
 
+    try:
         try:
             reader = PdfReader(tf.name)
             num_pages = reader.get_num_pages()
@@ -398,6 +399,9 @@ async def process_pdf(args, worker_id: int, pdf_orig_path: str):
             # You can't build a dolma doc with even 1 failed page, so just get out of here
             # However, you don't want to propagate an exception higher up and cancel the entire work_group
             return None
+    finally:
+        if os.path.exists(tf.name):
+            os.unlink(tf.name)
 
 
 def build_dolma_document(pdf_orig_path, page_results):
@@ -708,7 +712,7 @@ async def sglang_server_ready():
     raise Exception("sglang server did not become ready after waiting.")
 
 
-async def download_model(model_name_or_path: str, max_retries: int=5):
+async def download_model(model_name_or_path: str, max_retries: int = 5):
     for retry in range(max_retries):
         try:
             if model_name_or_path.startswith("s3://") or model_name_or_path.startswith("gs://") or model_name_or_path.startswith("weka://"):
@@ -728,7 +732,7 @@ async def download_model(model_name_or_path: str, max_retries: int=5):
                 return model_name_or_path
         except Exception:
             if retry == max_retries - 1:
-                raise # Raise on final attempt and fail the job
+                raise  # Raise on final attempt and fail the job
 
             sleep_time = random.randrange(2, 20) * 2**retry
             logger.exception(f"Could not download model, sleeping for {sleep_time} seconds to retry ({retry + 1}/{max_retries})")
