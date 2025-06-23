@@ -1,5 +1,5 @@
 model:
-  name_or_path: scb10x/typhoon-ocr-7b
+  name_or_path: Adun/typhoon-ocr-7b-v1
   arch: causal
   use_flash_attn: true
 
