@@ -303,34 +303,46 @@ async def process_page(args, worker_id: int, pdf_orig_path: str, pdf_local_path:
 
                 # Attempt to fix unterminated string errors
                 if "Unterminated string starting at" in str(e):
-                    # Try to append a closing quote and re-parse
-                    try:
-                        logger.info(f"Attempting to fix unterminated string for {pdf_orig_path}-{page_num} by appending '\"}}'")
-                        fixed_json_string = problematic_json_string + "\"}}" # Common case for Qwen2-VL output
-                        model_response_json = json.loads(fixed_json_string)
-                        page_response = PageResponse(**model_response_json)
+                    possible_fixes = [
+                        "\"}}",  # Common case for Qwen2-VL output
+                        "}}",
+                        "]}",
+                        "}",
+                        "\"\"]}", # For unterminated string within a list
+                        "\"}}}", # If the string is nested deeper
+                        "}}}",
+                    ]
+                    for fix_attempt_str in possible_fixes:
+                        try:
+                            logger.info(f"Attempting to fix unterminated string for {pdf_orig_path}-{page_num} by appending '{fix_attempt_str}'")
+                            fixed_json_string = problematic_json_string + fix_attempt_str
+                            model_response_json = json.loads(fixed_json_string)
+                            page_response = PageResponse(**model_response_json)
 
-                        if not page_response.is_rotation_valid and attempt < MAX_RETRIES - 1:
-                            logger.info(
-                                f"Got invalid_page rotation for {pdf_orig_path}-{page_num} attempt {attempt} (after fix), retrying with {page_response.rotation_correction} rotation"
+                            if not page_response.is_rotation_valid and attempt < MAX_RETRIES - 1:
+                                logger.info(
+                                    f"Got invalid_page rotation for {pdf_orig_path}-{page_num} attempt {attempt} (after fix with '{fix_attempt_str}'), retrying with {page_response.rotation_correction} rotation"
+                                )
+                                local_image_rotation = page_response.rotation_correction
+                                raise ValueError(f"invalid_page rotation for {pdf_orig_path}-{page_num} (after fix with '{fix_attempt_str}')")
+
+                            logger.info(f"Successfully fixed JSON for {pdf_orig_path}-{page_num} by appending '{fix_attempt_str}'")
+                            await tracker.track_work(worker_id, f"{pdf_orig_path}-{page_num}", f"finished_fixed_json_{fix_attempt_str}")
+                            return PageResult(
+                                pdf_orig_path,
+                                page_num,
+                                page_response,
+                                input_tokens=base_response_data["usage"].get("prompt_tokens", 0),
+                                output_tokens=base_response_data["usage"].get("completion_tokens", 0),
+                                is_fallback=False,
                             )
-                            local_image_rotation = page_response.rotation_correction
-                            raise ValueError(f"invalid_page rotation for {pdf_orig_path}-{page_num} (after fix)")
-
-                        await tracker.track_work(worker_id, f"{pdf_orig_path}-{page_num}", "finished_fixed_json")
-                        return PageResult(
-                            pdf_orig_path,
-                            page_num,
-                            page_response,
-                            input_tokens=base_response_data["usage"].get("prompt_tokens", 0),
-                            output_tokens=base_response_data["usage"].get("completion_tokens", 0),
-                            is_fallback=False,
-                        )
-                    except json.JSONDecodeError as fix_e:
-                        logger.warning(f"Failed to fix JSON for {pdf_orig_path}-{page_num} by appending '\"}}': {fix_e}")
-                    except Exception as ex_fix:
-                        logger.warning(f"Unexpected error during JSON fix attempt for {pdf_orig_path}-{page_num}: {ex_fix}")
-
+                        except json.JSONDecodeError as fix_e:
+                            logger.warning(f"Failed to fix JSON for {pdf_orig_path}-{page_num} by appending '{fix_attempt_str}': {fix_e}")
+                        except Exception as ex_fix:
+                            logger.warning(f"Unexpected error during JSON fix attempt for {pdf_orig_path}-{page_num} with '{fix_attempt_str}': {ex_fix}")
+                
+                # If none of the fixes worked, or if it wasn't an unterminated string error initially
+                logger.warning(f"All JSON fix attempts failed for {pdf_orig_path}-{page_num} or error was not 'Unterminated string'. Original error: {e}")
 
             local_anchor_text_len = max(1, local_anchor_text_len // 2)
             logger.info(f"Reducing anchor text len to {local_anchor_text_len} for {pdf_orig_path}-{page_num}")
