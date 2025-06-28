@@ -8,8 +8,7 @@ from typing import Optional
 import torch
 import torch.distributed as dist
 import wandb
-#from datasets.utils import disable_progress_bars
-from datasets.utils.logging import disable_progress_bars # Ensure this is imported
+from datasets import disable_progress_bar
 from datasets.utils.logging import set_verbosity
 from peft import LoraConfig, get_peft_model  
 from transformers import (
@@ -109,7 +108,9 @@ def setup_distributed_training():
     return False
 
 def run_train(config: TrainConfig):
+    # Setup distributed training first, this sets torch.cuda.set_device
     is_distributed = setup_distributed_training()
+    current_device = get_local_rank() if is_distributed else torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     # Adjust logging and progress bars based on rank
     if is_main_process():
@@ -117,7 +118,8 @@ def run_train(config: TrainConfig):
         # Wandb init should also be here if used
     else:
         logger_level = logging.WARN # Can be logging.ERROR to reduce noise
-        disable_progress_bars() # Disable progress bars on non-main processes
+        # if is_distributed: # only disable if actually distributed
+        #     disable_progress_bars() # Disable progress bars on non-main processes
 
     # The provided code sets logger_level to ERROR unconditionally later.
     # We'll keep that behavior for now but ensure it's after the distributed setup.
@@ -125,7 +127,6 @@ def run_train(config: TrainConfig):
     logger_level = logging.ERROR
     logger = get_logger(__name__, level=logger_level)
     set_verbosity(logger_level)
-
 
     run_name = RunName.get(config)
 
@@ -140,7 +141,9 @@ def run_train(config: TrainConfig):
     if "qwen" or "allenai" or "scb10x" or "Adun" in config.model.name_or_path.lower():
         #model = Qwen2VLForConditionalGeneration.from_pretrained(
         model = Qwen2_5_VLForConditionalGeneration.from_pretrained(    
-            config.model.name_or_path, torch_dtype=torch.bfloat16, _attn_implementation="flash_attention_2" if config.model.use_flash_attn else None
+            config.model.name_or_path, 
+            torch_dtype=torch.bfloat16, 
+            _attn_implementation="flash_attention_2" if config.model.use_flash_attn else None
         )
     else:
         from .molmo.config_molmo import MolmoConfig
@@ -159,6 +162,8 @@ def run_train(config: TrainConfig):
 
         model = MolmoForCausalLM.from_pretrained(config.model.name_or_path, torch_dtype=torch.bfloat16, config=model_config, trust_remote_code=True)
 
+    model = model.to('cuda')  # Add this after model initialization   
+
     logger.info(model)
 
     if config.lora is not None:
@@ -172,6 +177,15 @@ def run_train(config: TrainConfig):
         )
         model = get_peft_model(model=model, peft_config=peft_config)
         log_trainable_parameters(model=model, logger=logger)
+
+    # Explicitly move model to the designated device after loading and PEFT wrapping
+    if is_distributed:
+        model.to(current_device)
+        logger.info(f"Process {get_rank()}: Moved model to device {current_device}.")
+    elif torch.cuda.is_available(): # Single GPU case
+        model.to(current_device)
+        logger.info(f"Moved model to device {current_device}.")
+
 
     save_path = join_path("", config.save.path, run_name.run)
 
