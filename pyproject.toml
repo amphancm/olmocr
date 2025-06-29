@@ -36,13 +36,10 @@ dependencies = [
   "zstandard",
   "boto3",
   "httpx",
-<<<<<<< HEAD
   #"torch>=2.5.1",
   #"transformers==4.46.2",
-=======
   "torch>=2.7.0",
   "transformers>=4.51.1",
->>>>>>> upstream/main
   "img2pdf",
   "beaker-py",
 ]
