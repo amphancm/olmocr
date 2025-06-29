@@ -1,10 +1,10 @@
 import os
 import tempfile
 
+from marker.config.parser import ConfigParser
 from marker.converters.pdf import PdfConverter
 from marker.models import create_model_dict
 from marker.output import text_from_rendered
-from marker.config.parser import ConfigParser
 from pypdf import PdfReader, PdfWriter
 
 _marker_converter = None
@@ -17,7 +17,7 @@ def run_marker(pdf_path: str, page_num: int = 1) -> str:
         # Create a configuration dictionary with the necessary settings
         config = {
             "force_ocr": True,  # This enables conversion of inline math to LaTeX
-            "use_llm": False, # We would prefer to run just plain marker for reporting bench results, not hybrid mode
+            "use_llm": False,  # We would prefer to run just plain marker for reporting bench results, not hybrid mode
             "disable_tqdm": True,  # Disable tqdm for cleaner output
             "recognition_batch_size": 256,
             "layout_batch_size": 48,
