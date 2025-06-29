@@ -1,5 +1,5 @@
 model:
-  name_or_path: scb10x/typhoon-ocr-7b
+  name_or_path: Adun/typhoon_ocr-7b-v1.4
   arch: causal
   use_flash_attn: true
 
@@ -38,7 +38,7 @@ hparams:
   gradient_accumulation_steps: 4
   gradient_checkpointing: true
   clip_grad_norm: 1.0
-  learning_rate: 1e-6
+  learning_rate: 1e-4
   max_steps: 200
   pad_multiple_of: 16
   log_every_steps: 1
@@ -71,6 +71,6 @@ lora:
 
 save:
   path: /content/drive/MyDrive/TrainModel/olmocr
-  save_every_steps: 20
+  save_every_steps: 50
 
 max_workers: 10
