@@ -116,6 +116,7 @@ const runOCR = async () => {
       filename: uploadedFilename.value,
     });
     ocrText.value = response.data.ocr_text;
+    ocrError.value = ''; // Explicitly clear error on successful data retrieval
   } catch (error) {
     console.error('Error running OCR:', error);
     if (error.response) {
@@ -123,6 +124,7 @@ const runOCR = async () => {
     } else {
       ocrError.value = 'OCR failed: Network error or server not reachable.';
     }
+    ocrText.value = ''; // Clear any partial OCR text if an error occurred
   } finally {
     ocrRunning.value = false;
   }
