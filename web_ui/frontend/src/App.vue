@@ -133,35 +133,44 @@ const runOCR = async () => {
 </script>
 
 <style>
+html, body, #app {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
-  margin: 20px;
-  max-width: 1200px;
-  margin-left: auto;
-  margin-right: auto;
+  min-height: 100vh;
+  min-width: 100vw;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0 10px;
+  display: flex;
+  flex-direction: column;
 }
 
-.upload-section {
-  margin-bottom: 20px;
-  padding: 15px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  background-color: #f9f9f9;
+h1 {
+  text-align: center;
+  margin-top: 20px;
 }
 
-.upload-section label {
-  margin-right: 10px;
-  font-weight: bold;
-}
-
+.upload-section,
 .viewer-section {
   margin-bottom: 20px;
   padding: 15px;
   border: 1px solid #ddd;
   border-radius: 5px;
+  background-color: #f9f9f9;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.viewer-section {
   background-color: #f0f0f0;
   text-align: center;
 }
@@ -189,13 +198,20 @@ const runOCR = async () => {
 .content-display {
   display: flex;
   gap: 20px;
+  flex: 1 1 0;
+  min-height: 0;
+  margin-bottom: 20px;
 }
 
 .pdf-viewer, .ocr-output {
-  flex: 1;
+  flex: 1 1 0;
   padding: 15px;
   border: 1px solid #ddd;
   border-radius: 5px;
+  min-width: 0;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
 }
 
 .pdf-viewer h2, .ocr-output h2 {
@@ -208,13 +224,22 @@ const runOCR = async () => {
 
 .ocr-output textarea {
   width: 100%;
-  height: 450px; /* Matches iframe height roughly */
+  height: 100%;
+  min-height: 200px;
   box-sizing: border-box;
   border: 1px solid #ccc;
   border-radius: 4px;
   padding: 10px;
   font-family: monospace;
   resize: vertical;
+  flex: 1 1 0;
+}
+
+iframe {
+  border: 1px solid #ccc;
+  width: 100%;
+  height: 500px;
+  flex: 1 1 0;
 }
 
 .error-message {
@@ -222,7 +247,35 @@ const runOCR = async () => {
   margin-top: 10px;
 }
 
-iframe {
-  border: 1px solid #ccc;
+/* Responsive Design */
+@media (max-width: 900px) {
+  .content-display {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .pdf-viewer, .ocr-output {
+    min-width: 0;
+    width: 100%;
+  }
+  iframe, .ocr-output textarea {
+    height: 300px;
+  }
+}
+
+@media (max-width: 600px) {
+  #app {
+    padding: 0 2px;
+  }
+  .upload-section,
+  .viewer-section {
+    padding: 10px;
+    max-width: 100%;
+  }
+  .pdf-viewer, .ocr-output {
+    padding: 10px;
+  }
+  iframe, .ocr-output textarea {
+    height: 200px;
+  }
 }
 </style>
