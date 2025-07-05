@@ -96,7 +96,8 @@ def ocr_file():
         "python", "-m", "olmocr.pipeline",
         olmocr_workspace_path,
         "--pdfs", pdf_file_path_for_command,
-        "--model", "Adun/typhoon_ocr-7B-v1.4" # Ensure this model is available/downloaded by olmocr
+        "--model", "Adun/typhoon_ocr-7B-v1.4", # Ensure this model is available/downloaded by olmocr
+        "--output-to-stdout"
     ]
 
     logger.info(f"Running OCR command: {' '.join(command)}")

@@ -559,10 +559,13 @@ async def worker(args, work_queue: WorkQueue, semaphore, worker_id):
             )
 
             await work_queue.mark_done(work_item)
+            return dolma_docs  # Return the processed documents
         except Exception as e:
             logger.exception(f"Exception occurred while processing work_hash {work_item.hash}: {e}")
+            return None  # Return None in case of an exception
         finally:
             semaphore.release()
+    return None # Return None if the worker exits the loop
 
 
 async def sglang_server_task(model_name_or_path, args, semaphore):
@@ -1006,6 +1009,7 @@ async def main():
     parser.add_argument("--apply_filter", action="store_true", help="Apply basic filtering to English pdfs which are not forms, and not likely seo spam")
     parser.add_argument("--stats", action="store_true", help="Instead of running any job, reports some statistics about the current workspace")
     parser.add_argument("--markdown", action="store_true", help="Also write natural text to markdown files preserving the folder structure of the input pdfs")
+    parser.add_argument("--output-to-stdout", action="store_true", help="Print extracted text directly to stdout (intended for single PDF processing)")
 
     # Model parameters
     parser.add_argument(
@@ -1183,7 +1187,22 @@ async def main():
         worker_tasks.append(task)
 
     # Wait for all worker tasks to finish
-    await asyncio.gather(*worker_tasks)
+    all_results = await asyncio.gather(*worker_tasks)
+
+    if args.output_to_stdout:
+        logger.info("Outputting extracted text to stdout.")
+        for result_list_from_worker in all_results:
+            if result_list_from_worker:  # This is the list of dolma_docs from one worker
+                for doc in result_list_from_worker:
+                    if doc and 'text' in doc and doc['text'] is not None:
+                        print(doc['text'])
+                    else:
+                        logger.warning(f"Skipping doc in stdout output due to missing text: {doc.get('id', 'Unknown ID') if doc else 'None doc entry'}")
+            # else: (worker might have returned None due to error or no work)
+                # logger.debug("A worker returned no results.")
+        # Ensure stdout is flushed if it's buffered
+        sys.stdout.flush()
+
 
     # Wait for server to stop
     process_pool.shutdown(wait=False)
