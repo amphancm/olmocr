@@ -7,24 +7,24 @@
       <input type="file" id="file-input" @change="handleFileChange" accept=".pdf" />
     </div>
 
-    <div v.if="pdfFile" class="viewer-section">
+    <div v-if="pdfFile" class="viewer-section">
       <button @click="runOCR" :disabled="ocrRunning || !pdfUploaded">
         {{ ocrRunning ? 'Processing...' : 'Run OCR' }}
       </button>
-      <p v.if="uploadError" class="error-message">{{ uploadError }}</p>
-      <p v.if="ocrError" class="error-message">OCR Error: {{ ocrError }}</p>
+      <p v-if="uploadError" class="error-message">{{ uploadError }}</p>
+      <p v-if="ocrError" class="error-message">OCR Error: {{ ocrError }}</p>
     </div>
 
     <div class="content-display">
       <div class="pdf-viewer">
         <h2>PDF Preview</h2>
-        <iframe v.if="pdfPreviewUrl" :src="pdfPreviewUrl" width="100%" height="500px"></iframe>
-        <p v.else>Select a PDF file to preview.</p>
+        <iframe v-if="pdfPreviewUrl" :src="pdfPreviewUrl" width="100%" height="500px"></iframe>
+        <p v-else>Select a PDF file to preview.</p>
       </div>
 
       <div class="ocr-output">
         <h2>OCR Text</h2>
-        <textarea v.model="ocrText" readonly placeholder="OCR output will appear here..."></textarea>
+        <textarea v-model="ocrText" readonly placeholder="OCR output will appear here..."></textarea>
       </div>
     </div>
   </div>
