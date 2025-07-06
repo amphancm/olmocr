@@ -6,6 +6,10 @@ export default defineConfig({
   plugins: [vue()],
   server: {
     port: 8080,
-    host: '0.0.0.0'
+    host: '0.0.0.0',
+    allowedHosts: ['deepseax.natachat.com']
+  },
+  preview: {
+    allowedHosts: ['deepseax.natachat.com']
   },
 })

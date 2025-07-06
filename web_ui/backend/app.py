@@ -11,9 +11,9 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
 
-UPLOAD_FOLDER = 'uploads'
+UPLOAD_FOLDER          = 'uploads'
 LOCAL_WORKSPACE_FOLDER = 'localworkspace'
-ALLOWED_EXTENSIONS = {'pdf'}
+ALLOWED_EXTENSIONS     = {'pdf'}
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['LOCAL_WORKSPACE_FOLDER'] = LOCAL_WORKSPACE_FOLDER
@@ -87,7 +87,7 @@ def ocr_file():
 
     project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
     # Correct paths relative to project_root
-    olmocr_workspace_path = os.path.join('web_ui', 'backend', LOCAL_WORKSPACE_FOLDER)
+    olmocr_workspace_path     = os.path.join('web_ui', 'backend', LOCAL_WORKSPACE_FOLDER)
     pdf_file_path_for_command = os.path.join('web_ui', 'backend', UPLOAD_FOLDER, filename)
 
     # Command to be executed from project_root
@@ -96,7 +96,8 @@ def ocr_file():
         "python", "-m", "olmocr.pipeline",
         olmocr_workspace_path,
         "--pdfs", pdf_file_path_for_command,
-        "--model", "Adun/typhoon_ocr-7B-v1.4", # Ensure this model is available/downloaded by olmocr
+        #"--model", "Adun/typhoon_ocr-7B-v1.4", # Ensure this model is available/downloaded by olmocr
+        "--model", "Adun/olmOCR-7B-thai-v3.1", 
         "--output-to-stdout"
     ]
 

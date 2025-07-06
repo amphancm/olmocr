@@ -60,8 +60,8 @@ const handleFileChange = async (event) => {
     // Immediately upload the file
     await uploadPdf();
   } else {
-    pdfFile.value = null;
-    pdfPreviewUrl.value = '';
+    pdfFile.value          = null;
+    pdfPreviewUrl.value    = '';
     uploadedFilename.value = '';
     pdfUploaded.value = false;
     uploadError.value = 'Please select a valid PDF file.';
@@ -108,8 +108,8 @@ const runOCR = async () => {
   }
 
   ocrRunning.value = true;
-  ocrError.value = '';
-  ocrText.value = '';
+  ocrError.value   = '';
+  ocrText.value    = '';
 
   try {
     const response = await axios.post(`${FLASK_BASE_URL}/api/ocr`, {

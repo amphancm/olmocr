@@ -1003,7 +1003,7 @@ async def main():
     parser.add_argument("--workspace_profile", help="S3 configuration profile for accessing the workspace", default=None)
     parser.add_argument("--pdf_profile", help="S3 configuration profile for accessing the raw pdf documents", default=None)
     parser.add_argument("--pages_per_group", type=int, default=100, help="Aiming for this many pdf pages per work item group")
-    parser.add_argument("--max_page_retries", type=int, default=8, help="Max number of times we will retry rendering a page")
+    parser.add_argument("--max_page_retries", type=int, default=2, help="Max number of times we will retry rendering a page")
     parser.add_argument("--max_page_error_rate", type=float, default=0.004, help="Rate of allowable failed pages in a document, 1/250 by default")
     parser.add_argument("--workers", type=int, default=8, help="Number of workers to run at a time")
     parser.add_argument("--apply_filter", action="store_true", help="Apply basic filtering to English pdfs which are not forms, and not likely seo spam")
@@ -1057,18 +1057,18 @@ async def main():
 
         # Wait a little bit so that not all beaker jobs in a task start at the same time and download the model at the same time
         replica_count = int(os.environ.get("BEAKER_REPLICA_COUNT", "1"))
-        interval = 10 if (replica_count - 1) * 10 <= 30 else 30 / max(1, replica_count - 1)
-        sleep_time = int(os.environ.get("BEAKER_REPLICA_RANK", "0")) * interval
+        interval      = 10 if (replica_count - 1) * 10 <= 30 else 30 / max(1, replica_count - 1)
+        sleep_time    = int(os.environ.get("BEAKER_REPLICA_RANK", "0")) * interval
         logger.info(f"Beaker job sleeping for {sleep_time} seconds to stagger model downloads")
         await asyncio.sleep(sleep_time)
 
     if args.workspace_profile:
         workspace_session = boto3.Session(profile_name=args.workspace_profile)
-        workspace_s3 = workspace_session.client("s3")
+        workspace_s3      = workspace_session.client("s3")
 
     if args.pdf_profile:
         pdf_session = boto3.Session(profile_name=args.pdf_profile)
-        pdf_s3 = pdf_session.client("s3")
+        pdf_s3      = pdf_session.client("s3")
 
     # We need poppler to load the initial pdfs, even if we are not processing them here
     check_poppler_version()
