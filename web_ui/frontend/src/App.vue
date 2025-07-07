@@ -43,7 +43,7 @@ const ocrRunning  = ref(false);
 const uploadError = ref('');
 const ocrError    = ref('');
 
-const FLASK_BASE_URL = 'http://localhost:5000'; // Assuming Flask runs on port 5000
+const FLASK_BASE_URL = 'https://deepseax.natachat.com'; // Assuming Flask runs on port 5000
 
 const handleFileChange = async (event) => {
   const file = event.target.files[0];
