@@ -661,8 +661,8 @@ async def sglang_server_task(model_name_or_path, args, semaphore):
             pass  # Clean up if the task is cancelled
 
     # Start tasks to read stdout, stderr, and handle timeout logic
-    stdout_task = asyncio.create_task(read_stream(proc.stdout))
-    stderr_task = asyncio.create_task(read_stream(proc.stderr))
+    stdout_task  = asyncio.create_task(read_stream(proc.stdout))
+    stderr_task  = asyncio.create_task(read_stream(proc.stderr))
     timeout_task = asyncio.create_task(timeout_task())
 
     try:
@@ -884,14 +884,14 @@ def print_stats(args, root_work_queue):
         try:
             data = get_s3_bytes(workspace_s3, s3_path)
             doc_count = 0
-            total_input_tokens = 0
+            total_input_tokens  = 0
             total_output_tokens = 0
             total_pages = 0
             total_fallback_pages = 0
             processed_paths = set()
 
             # Counters for long context docs within a single file
-            long_context_docs = 0
+            long_context_docs   = 0
             long_context_tokens = 0
 
             for line in data.decode("utf-8").splitlines():
