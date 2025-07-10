@@ -21,6 +21,17 @@
       </div>
       <p v-if="uploadError" class="error-message">{{ uploadError }}</p>
       <p v-if="ocrError" class="error-message">OCR Error: {{ ocrError }}</p>
+      <p v-if="totalPages > 0">Total Pages: {{ totalPages }}</p>
+    </div>
+
+    <div v-if="totalPages > 0 && pageData.length > 0" class="page-status-container">
+      <h2>Page Processing Status</h2>
+      <ul>
+        <li v-for="page in pageData" :key="page.pageNum" :class="`status-${page.status}`">
+          Page {{ page.pageNum }}: {{ page.status }}
+          <span v-if="page.status === 'error'" class="page-error-details"> - Check console for details if any.</span>
+        </li>
+      </ul>
     </div>
 
     <div class="content-display">
@@ -32,14 +43,14 @@
 
       <div class="ocr-output">
         <h2>OCR Text</h2>
-        <textarea v-model="ocrText" readonly placeholder="OCR output will appear here..."></textarea>
+        <textarea v-model="aggregatedOcrText" readonly placeholder="OCR output will appear here..."></textarea>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue'; // Import computed
 import axios from 'axios';
 
 const pdfFile       = ref(null);
@@ -50,6 +61,10 @@ const ocrText     = ref('');
 const ocrRunning  = ref(false);
 const uploadError = ref('');
 const ocrError    = ref('');
+
+// New reactive variables for multi-page handling
+const totalPages  = ref(0);
+const pageData    = ref([]); // To store { pageNum: number, status: string, text: string }
 
 // Timer related reactive variables
 const timerValue  = ref(0);
@@ -97,14 +112,30 @@ const uploadPdf = async () => {
     });
     uploadedFilename.value = response.data.filename;
     pdfUploaded.value = true;
-    // Update iframe to point to the served PDF after successful upload,
-    // so it works even if object URL has issues or for consistency.
-    // pdfPreviewUrl.value = `${FLASK_BASE_URL}/uploads/${response.data.filename}`;
-    // Sticking with object URL for immediate preview, flask endpoint is a fallback or for non-browser display
     console.log('File uploaded:', response.data.filename);
+
+    // Fetch PDF info (total pages)
+    try {
+      const infoResponse = await axios.get(`${FLASK_BASE_URL}/api/pdf-info/${response.data.filename}`);
+      totalPages.value = infoResponse.data.totalPages;
+      // Initialize pageData based on totalPages
+      pageData.value = Array.from({ length: totalPages.value }, (_, i) => ({
+        pageNum: i + 1,
+        status: 'pending', // Possible statuses: pending, processing, success, success_fallback, error, skipped
+        text: ''
+      }));
+    } catch (infoError) {
+      console.error('Error fetching PDF info:', infoError);
+      uploadError.value += ` Could not fetch PDF info: ${infoError.response?.data?.error || infoError.message}.`;
+      totalPages.value = 0;
+      pageData.value = [];
+    }
+
   } catch (error) {
     console.error('Error uploading file:', error);
     pdfUploaded.value = false;
+    totalPages.value = 0;
+    pageData.value = [];
     if (error.response) {
       uploadError.value = `Upload failed: ${error.response.data.error || 'Server error'}`;
     } else {
@@ -131,38 +162,184 @@ const runOCR = async () => {
   }, 1000);
 
   ocrRunning.value = true;
-  ocrError.value   = '';
-  ocrText.value    = '';
+  ocrError.value = '';
+  // ocrText.value = ''; // This will be handled by aggregatedOcrText
 
-  try {
-    const response = await axios.post(`${FLASK_BASE_URL}/api/ocr`, {
-      filename: uploadedFilename.value,
-    });
-    ocrText.value = response.data.ocr_text;
-    ocrError.value = ''; // Explicitly clear error on successful data retrieval
-  } catch (error) {
-    console.error('Error running OCR:', error);
-    if (error.response) {
-      ocrError.value = `OCR failed: ${error.response.data.error || 'Server error'}. Details: ${error.response.data.details || ''}`;
-    } else {
-      ocrError.value = 'OCR failed: Network error or server not reachable.';
+  // Reset pageData statuses
+  pageData.value.forEach(p => {
+    p.status = 'pending'; // Reset to pending before new run
+    p.text = '';
+  });
+
+  // Using fetch for POST request that returns a stream (SSE)
+  fetch(`${FLASK_BASE_URL}/api/ocr-stream`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'text/event-stream'
+    },
+    body: JSON.stringify({ filename: uploadedFilename.value })
+  })
+  .then(response => {
+    if (!response.ok) {
+      return response.json().then(errData => {
+        throw new Error(`Server error: ${response.status}. ${errData.error || JSON.stringify(errData)}`);
+      }).catch(() => {
+        throw new Error(`Server error: ${response.status} ${response.statusText}.`);
+      });
     }
-    ocrText.value = ''; // Clear any partial OCR text if an error occurred
-  } finally {
+    if (!response.body) {
+      throw new Error('Response body is null, cannot read stream.');
+    }
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+
+    function streamData() {
+      reader.read().then(({ done, value }) => {
+        if (done) {
+          console.log('Stream completed.');
+          if (ocrRunning.value) { // If not already set to false by a summary or error event
+             ocrRunning.value = false;
+             if (timerInterval) clearInterval(timerInterval);
+             timerStatus.value = 'stopped';
+          }
+          return;
+        }
+
+        const chunk = decoder.decode(value, { stream: true });
+        const eventMessages = chunk.split('\n\n');
+
+        eventMessages.forEach(eventMessage => {
+          if (eventMessage.startsWith('data: ')) {
+            const jsonString = eventMessage.substring(6).trim();
+            if (jsonString) {
+              try {
+                const data = JSON.parse(jsonString);
+                console.log('SSE data:', data);
+
+                if (data.type === 'info') {
+                  if (data.totalPages > 0 && totalPages.value !== data.totalPages) {
+                    totalPages.value = data.totalPages;
+                    pageData.value = Array.from({ length: data.totalPages }, (_, i) => ({
+                      pageNum: i + 1, status: 'pending', text: ''
+                    }));
+                  }
+                  if (data.error) { // Early error from pipeline (e.g. PDF read error)
+                    ocrError.value = `Pipeline init error: ${data.error}`;
+                    ocrRunning.value = false;
+                    if (timerInterval) clearInterval(timerInterval); timerStatus.value = 'stopped';
+                    reader.cancel(); // Stop the stream
+                  }
+                } else if (data.type === 'page_event') {
+                  const page = pageData.value.find(p => p.pageNum === data.page);
+                  if (page) page.status = data.status; // e.g., 'processing'
+                } else if (data.type === 'page_result') {
+                  const page = pageData.value.find(p => p.pageNum === data.page);
+                  if (page) {
+                    page.status = data.status; // success, success_fallback, error, skipped
+                    page.text = data.text || '';
+                    // Optionally log or display per-page errors more prominently
+                    if (data.status === 'error' && data.message && !ocrError.value) {
+                       // console.warn(`Error on page ${data.page}: ${data.message}`);
+                       // ocrError.value = `Error on page ${data.page}: ${data.message}`; // This might be too noisy
+                    }
+                  }
+                } else if (data.type === 'summary') {
+                  console.log('OCR Summary:', data);
+                  if (data.status === 'error' || data.status === 'error_rate_exceeded' || data.total_errors > 0) {
+                    if (!ocrError.value) ocrError.value = `OCR process completed with ${data.total_errors} errors. Status: ${data.status}.`;
+                  }
+                  ocrRunning.value = false; // Mark as not running once summary is received
+                  if (timerInterval) clearInterval(timerInterval); timerStatus.value = 'stopped';
+                } else if (data.type === 'error') { // General stream error from backend
+                  ocrError.value = data.message + (data.details ? ` Details: ${data.details}` : '');
+                  ocrRunning.value = false;
+                  if (timerInterval) clearInterval(timerInterval); timerStatus.value = 'stopped';
+                  reader.cancel(); // Stop the stream
+                }
+              } catch (e) {
+                console.error('Error parsing SSE JSON:', e, 'Received:', jsonString);
+              }
+            }
+          }
+        });
+        streamData(); // Continue reading
+      }).catch(error => {
+        console.error('Error reading from stream:', error);
+        ocrError.value = `Stream reading error: ${error.message}`;
+        ocrRunning.value = false;
+        if (timerInterval) clearInterval(timerInterval); timerStatus.value = 'stopped';
+      });
+    }
+    streamData(); // Start reading the stream
+  })
+  .catch(error => {
+    console.error('Error setting up OCR stream:', error);
+    ocrError.value = `Failed to start OCR: ${error.message}`;
     ocrRunning.value = false;
-    // Stop timer
     if (timerInterval) clearInterval(timerInterval);
-    timerInterval = null;
-    timerStatus.value = 'stopped'; // Timer has stopped
-    // Optionally, decide if showTimer should be set to false here or if the timer stays visible.
-    // For now, timer resets on next run. If you want to hide it:
-    // showTimer.value = false;
-  }
+    timerStatus.value = 'stopped';
+  });
 };
+
+const aggregatedOcrText = computed(() => {
+  // Concatenate text from all pages that have a success status
+  return pageData.value
+    .filter(p => (p.status === 'success' || p.status === 'success_fallback') && p.text)
+    .map(p => `--- Page ${p.pageNum} ---\n${p.text}`) // Add page separator for clarity
+    .join('\n\n');
+});
 
 </script>
 
 <style>
+.page-status-container {
+  margin-bottom: 20px;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.page-status-container h2 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-size: 1.2em;
+}
+
+.page-status-container ul {
+  list-style-type: none;
+  padding: 0;
+  max-height: 200px; /* Example max height for scroll */
+  overflow-y: auto; /* Enable scroll if content overflows */
+}
+
+.page-status-container li {
+  padding: 5px 0;
+  border-bottom: 1px solid #eee;
+}
+.page-status-container li:last-child {
+  border-bottom: none;
+}
+
+/* Status-specific styling */
+.status-pending { color: #757575; } /* Grey */
+.status-processing { color: #1976D2; } /* Blue */
+.status-success { color: #388E3C; } /* Green */
+.status-success_fallback { color: #FFA000; } /* Amber */
+.status-error { color: #D32F2F; } /* Red */
+.status-skipped { color: #7B1FA2; } /* Purple */
+
+.page-error-details {
+  font-style: italic;
+  font-size: 0.9em;
+}
+
+
 html, body, #app {
   height: 100%;
   margin: 0;

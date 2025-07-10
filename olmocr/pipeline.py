@@ -353,41 +353,105 @@ async def process_pdf(args, worker_id: int, pdf_orig_path: str):
             num_pages = reader.get_num_pages()
         except:
             logger.exception(f"Could not count number of pages for {pdf_orig_path}, aborting document")
+            if args.stream_json:
+                print(json.dumps({"type": "info", "totalPages": 0, "error": f"Could not read PDF: {pdf_orig_path}"}), flush=True)
+                print(json.dumps({"type": "summary", "total_pages_processed": 0, "total_errors": 0, "error": "PDF reading failed"}), flush=True)
             return None
 
         logger.info(f"Got {num_pages} pages to do for {pdf_orig_path} in worker {worker_id}")
+        if args.stream_json:
+            print(json.dumps({"type": "info", "totalPages": num_pages}), flush=True)
 
         if args.apply_filter and get_pdf_filter().filter_out_pdf(tf.name):
             logger.info(f"Filtering out pdf {pdf_orig_path}")
+            if args.stream_json:
+                # If filtered out, communicate this as a kind of error or skip for each page
+                for i in range(1, num_pages + 1):
+                    print(json.dumps({
+                        "type": "page_result", "page": i, "status": "skipped",
+                        "message": "PDF filtered out by global filter.", "text": "", "is_fallback": False
+                    }), flush=True)
+                print(json.dumps({"type": "summary", "total_pages_processed": 0, "total_errors": num_pages, "status": "filtered_out"}), flush=True)
             return None
 
-        # List to hold the tasks for processing each page
-        page_tasks = []
-        page_results = []
+        page_results_collected = []
+        total_processed_for_summary = 0
+        total_errors_for_summary = 0
 
         try:
-            async with asyncio.TaskGroup() as tg:
-                for page_num in range(1, num_pages + 1):
-                    task = tg.create_task(process_page(args, worker_id, pdf_orig_path, tf.name, page_num))
-                    page_tasks.append(task)
+            if args.stream_json:
+                for page_num_loop in range(1, num_pages + 1): # Use different var name to avoid conflict if page_num is used later
+                    print(json.dumps({"type": "page_event", "page": page_num_loop, "status": "processing"}), flush=True)
+                    # Process pages sequentially for streaming to allow immediate feedback
+                    page_res = await process_page(args, worker_id, pdf_orig_path, tf.name, page_num_loop)
+                    page_results_collected.append(page_res)
 
-            # Collect the results from the entire task group, assuming no exceptions
-            page_results = [task.result() for task in page_tasks]
+                    text_content = page_res.response.natural_text if page_res.response and page_res.response.natural_text else ""
+                    current_page_status = ""
+                    if not page_res.is_fallback and text_content:
+                        current_page_status = "success"
+                        total_processed_for_summary += 1
+                    elif page_res.is_fallback and text_content:
+                        current_page_status = "success_fallback"
+                        total_processed_for_summary += 1
+                    else:
+                        current_page_status = "error"
+                        total_errors_for_summary += 1
 
-            num_fallback_pages = sum(page_result.is_fallback for page_result in page_results)
+                    print(json.dumps({
+                        "type": "page_result",
+                        "page": page_res.page_num,
+                        "status": current_page_status,
+                        "text": text_content, # text_content is already "" if None
+                        "is_fallback": page_res.is_fallback
+                    }), flush=True)
+            else: # Original concurrent processing for non-streaming cases
+                page_tasks = []
+                async with asyncio.TaskGroup() as tg:
+                    for page_num_loop in range(1, num_pages + 1):
+                        task = tg.create_task(process_page(args, worker_id, pdf_orig_path, tf.name, page_num_loop))
+                        page_tasks.append(task)
+                page_results_collected = [task.result() for task in page_tasks]
+                # Calculate summary stats for non-streaming path if needed later, though primarily for stream_json summary
+                successful_fallback_pages = sum(1 for pr in page_results_collected if pr.is_fallback and pr.response and pr.response.natural_text)
+                successful_normal_pages = sum(1 for pr in page_results_collected if not pr.is_fallback and pr.response and pr.response.natural_text)
+                total_processed_for_summary = successful_fallback_pages + successful_normal_pages
+                total_errors_for_summary = num_pages - total_processed_for_summary
+
+            num_fallback_pages = sum(pr.is_fallback for pr in page_results_collected)
 
             if num_fallback_pages / num_pages > args.max_page_error_rate:
                 logger.error(
                     f"Document {pdf_orig_path} has {num_fallback_pages} fallback pages out of {num_pages} exceeding max_page_error_rate of {args.max_page_error_rate}, discarding document."
                 )
+                if args.stream_json:
+                    # This summary might overwrite individual page errors if they weren't counted yet.
+                    # The logic for total_errors_for_summary should be consistent.
+                    # For now, let's assume the per-page errors are primary.
+                    print(json.dumps({"type": "summary", "total_pages_processed": total_processed_for_summary, "total_errors": total_errors_for_summary + (num_pages - total_processed_for_summary - total_errors_for_summary) , "status": "error_rate_exceeded"}), flush=True)
                 return None
             elif num_fallback_pages > 0:
                 logger.warning(
                     f"Document {pdf_orig_path} processed with {num_fallback_pages} fallback pages out of {num_pages}, proceeding to build Dolma document."
                 )
 
-            return build_dolma_document(pdf_orig_path, page_results)
+            if args.stream_json:
+                # Final summary if not already printed due to error rate
+                if not (num_fallback_pages / num_pages > args.max_page_error_rate) :
+                     print(json.dumps({"type": "summary", "total_pages_processed": total_processed_for_summary, "total_errors": total_errors_for_summary, "status": "completed"}), flush=True)
+                # If streaming, we've handled output. Return the collected page results if needed by non-streaming paths,
+                # but the dolma_doc is built from these.
+                # For a pure streaming path, we might not need to build or return dolma_doc if the consumer only cares about the stream.
+                # However, existing infra expects dolma_doc.
+                return build_dolma_document(pdf_orig_path, page_results_collected)
+
+
+            return build_dolma_document(pdf_orig_path, page_results_collected)
         except Exception as e:
+            if args.stream_json:
+                # Catch-all for unexpected errors during page processing group
+                print(json.dumps({"type": "summary", "total_pages_processed": total_processed_for_summary, "total_errors": num_pages - total_processed_for_summary, "status": "error", "message": str(e)}), flush=True)
+
             # Check for ExceptionGroup with BrokenProcessPool
             if isinstance(e, ExceptionGroup):
                 broken_pool, other = e.split(BrokenProcessPool)
@@ -1010,6 +1074,7 @@ async def main():
     parser.add_argument("--stats", action="store_true", help="Instead of running any job, reports some statistics about the current workspace")
     parser.add_argument("--markdown", action="store_true", help="Also write natural text to markdown files preserving the folder structure of the input pdfs")
     parser.add_argument("--output-to-stdout", action="store_true", help="Print extracted text directly to stdout (intended for single PDF processing)")
+    parser.add_argument("--stream-json", action="store_true", help="Print progress and results as JSON lines to stdout (intended for single PDF processing with UI integration)")
 
     # Model parameters
     parser.add_argument(
@@ -1189,7 +1254,13 @@ async def main():
     # Wait for all worker tasks to finish
     all_results = await asyncio.gather(*worker_tasks)
 
-    if args.output_to_stdout:
+    if args.stream_json:
+        # All JSON line output is handled by process_pdf directly when stream_json is enabled.
+        # The process_pdf function flushes stdout after each JSON line.
+        # We just log that the streaming mode was active.
+        logger.info("JSON streaming to stdout was handled by process_pdf.")
+        sys.stdout.flush() # Final flush from main
+    elif args.output_to_stdout:
         logger.info("Outputting extracted text to stdout.")
         for result_list_from_worker in all_results:
             if result_list_from_worker:  # This is the list of dolma_docs from one worker

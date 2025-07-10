@@ -2,7 +2,8 @@ import os
 import logging
 import subprocess
 from flask_cors import CORS
-from flask import Flask, request, jsonify, send_from_directory
+from flask import Flask, request, jsonify, send_from_directory, Response, stream_with_context
+from pypdf import PdfReader # Added for reading PDF info
 
 
 # Configure logging
@@ -59,6 +60,28 @@ def upload_file():
     else:
         logger.warning(f"File type not allowed: {file.filename}")
         return jsonify({"error": "File type not allowed"}), 400
+
+@app.route('/api/pdf-info/<path:filename>', methods=['GET'])
+def pdf_info(filename):
+    # Basic security check
+    if ".." in filename or filename.startswith("/"):
+        logger.warning(f"Invalid filename for PDF info: {filename}")
+        return jsonify({"error": "Invalid filename"}), 400
+
+    filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+
+    if not os.path.exists(filepath):
+        logger.warning(f"PDF file not found for info: {filepath}")
+        return jsonify({"error": "PDF file not found"}), 404
+
+    try:
+        reader = PdfReader(filepath)
+        num_pages = len(reader.pages)
+        logger.info(f"PDF info for '{filename}': {num_pages} pages.")
+        return jsonify({"filename": filename, "totalPages": num_pages}), 200
+    except Exception as e:
+        logger.error(f"Error reading PDF info for '{filename}': {e}")
+        return jsonify({"error": f"Error reading PDF info: {str(e)}"}), 500
 
 @app.route('/api/ocr', methods=['POST'])
 def ocr_file():
@@ -146,6 +169,88 @@ def send_uploaded_file(filename):
 
     logger.info(f"Serving file: {filename} from {app.config['UPLOAD_FOLDER']}")
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+
+@app.route('/api/ocr-stream', methods=['POST'])
+def ocr_stream():
+    data = request.get_json()
+    if not data or 'filename' not in data:
+        logger.warning("No filename provided for OCR stream")
+        return jsonify({"error": "No filename provided"}), 400
+
+    filename = data['filename']
+    if ".." in filename or filename.startswith("/"):
+        logger.warning(f"Invalid filename for OCR stream: {filename}")
+        return jsonify({"error": "Invalid filename"}), 400
+
+    pdf_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    if not os.path.exists(pdf_path):
+        logger.warning(f"PDF file not found for OCR stream: {pdf_path}")
+        return jsonify({"error": "PDF file not found"}), 404
+
+    project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+    olmocr_workspace_path = os.path.join('web_ui', 'backend', LOCAL_WORKSPACE_FOLDER)
+    pdf_file_path_for_command = os.path.join('web_ui', 'backend', UPLOAD_FOLDER, filename)
+
+    command = [
+        "python", "-m", "olmocr.pipeline",
+        olmocr_workspace_path,
+        "--pdfs", pdf_file_path_for_command,
+        "--model", "Adun/olmOCR-7B-thai-v3.2", # Consider making model configurable
+        "--stream-json" # Use the new flag for JSON streaming
+    ]
+
+    logger.info(f"Running OCR stream command: {' '.join(command)}")
+    logger.info(f"Executing from directory: {project_root}")
+
+    process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, cwd=project_root, bufsize=1, universal_newlines=True)
+
+    def generate_output():
+        try:
+            # Stream stdout
+            if process.stdout:
+                for line in iter(process.stdout.readline, ''):
+                    if line.strip(): # Ensure line is not empty
+                        # Each line is a JSON object, prefix with 'data: ' for SSE
+                        yield f"data: {line.strip()}\n\n"
+
+            # After stdout is exhausted, check stderr for any errors
+            stderr_output = []
+            if process.stderr:
+                stderr_output = process.stderr.readlines()
+
+            process.wait() # Wait for the subprocess to complete
+
+            if process.returncode != 0:
+                error_message = "OCR processing failed during streaming."
+                if stderr_output:
+                    error_message += " Details: " + "".join(stderr_output).strip()
+                logger.error(f"OCR stream command failed for '{filename}'. Return code: {process.returncode}. Stderr: {''.join(stderr_output)}")
+                # Send a final error event
+                error_event = {"type": "error", "message": error_message, "details": "".join(stderr_output).strip()}
+                yield f"data: {json.dumps(error_event)}\n\n"
+            else:
+                logger.info(f"OCR stream command successful for '{filename}'.")
+                # Optionally send a completion event if not already handled by pipeline's summary
+                # completion_event = {"type": "complete", "message": "OCR processing completed."}
+                # yield f"data: {json.dumps(completion_event)}\n\n"
+
+        except Exception as e:
+            logger.error(f"Exception during OCR streaming for '{filename}': {e}")
+            error_event = {"type": "error", "message": f"An unexpected error occurred during streaming: {str(e)}"}
+            yield f"data: {json.dumps(error_event)}\n\n"
+        finally:
+            if process.stdout:
+                process.stdout.close()
+            if process.stderr:
+                process.stderr.close()
+            # Ensure process is terminated if it's still alive for any reason
+            if process.poll() is None: # Check if process is still running
+                process.terminate()
+                process.wait()
+
+
+    return Response(stream_with_context(generate_output()), content_type='text/event-stream')
+
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
