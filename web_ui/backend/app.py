@@ -1,8 +1,9 @@
 import os
-import subprocess
-from flask import Flask, request, jsonify, send_from_directory
-from flask_cors import CORS
 import logging
+import subprocess
+from flask_cors import CORS
+from flask import Flask, request, jsonify, send_from_directory
+
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -36,8 +37,18 @@ def upload_file():
         logger.warning("No selected file")
         return jsonify({"error": "No selected file"}), 400
     if file and allowed_file(file.filename):
-        filename = file.filename # In a real app, sanitize this
+        original_filename = file.filename # In a real app, sanitize this
+        filename = original_filename
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        
+        # Handle duplicate filenames
+        counter = 1
+        name, ext = os.path.splitext(filename)
+        while os.path.exists(filepath):
+            filename = f"{name}_{counter}{ext}"
+            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            counter += 1
+            
         try:
             file.save(filepath)
             logger.info(f"File '{filename}' uploaded successfully to '{filepath}'")

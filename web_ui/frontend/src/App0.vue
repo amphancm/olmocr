@@ -2,7 +2,7 @@
   <div id="app">
     <div class="header-row">
       <h1>PDF OCR Processor</h1>
-      <span class="version-label">v0.11</span>
+      <span class="version-label">v0.12</span>
     </div>
 
     <div class="upload-section">
@@ -15,13 +15,14 @@
         <button @click="runOCR" :disabled="ocrRunning || !pdfUploaded">
           {{ ocrRunning ? 'Processing...' : 'Run OCR' }}
         </button>
-        <span v-if="showTimer" :class="timerStatus === 'running' ? 'timer-running' : 'timer-stopped'" style="margin-left: 10px;">
+        <span v-if="showTimer" style="margin-left: 10px;">
           Timer: {{ timerValue }}s
         </span>
       </div>
       <p v-if="uploadError" class="error-message">{{ uploadError }}</p>
       <p v-if="ocrError" class="error-message">OCR Error: {{ ocrError }}</p>
     </div>
+
 
     <div class="content-display">
       <div class="pdf-viewer">
@@ -54,7 +55,6 @@ const ocrError    = ref('');
 // Timer related reactive variables
 const timerValue  = ref(0);
 const showTimer   = ref(false);
-const timerStatus = ref('stopped'); // Can be 'running' or 'stopped'
 let timerInterval = null; // To store the interval ID
 
 const FLASK_BASE_URL = 'https://deepseax.natachat.com'; // Assuming Flask runs on port 5000
@@ -121,10 +121,10 @@ const runOCR = async () => {
     return;
   }
 
+  
   // Start timer
   showTimer.value = true;
   timerValue.value = 0;
-  timerStatus.value = 'running'; // Timer is now running
   if (timerInterval) clearInterval(timerInterval);
   timerInterval = setInterval(() => {
     timerValue.value++;
@@ -153,7 +153,6 @@ const runOCR = async () => {
     // Stop timer
     if (timerInterval) clearInterval(timerInterval);
     timerInterval = null;
-    timerStatus.value = 'stopped'; // Timer has stopped
     // Optionally, decide if showTimer should be set to false here or if the timer stays visible.
     // For now, timer resets on next run. If you want to hide it:
     // showTimer.value = false;
@@ -161,6 +160,8 @@ const runOCR = async () => {
 };
 
 </script>
+
+
 
 <style>
 html, body, #app {
@@ -297,14 +298,6 @@ iframe {
   margin-top: 10px;
 }
 
-.timer-running {
-  color: green;
-}
-
-.timer-stopped {
-  color: red;
-}
-
 /* Responsive Design */
 @media (max-width: 900px) {
   .content-display {
@@ -319,6 +312,14 @@ iframe {
     height: 300px;
   }
 }
+
+.running {
+  color: green;
+}
+.stopped {
+  color: red;
+}
+
 
 @media (max-width: 600px) {
   #app {
