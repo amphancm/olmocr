@@ -2,7 +2,7 @@
   <div id="app">
     <div class="header-row">
       <h1>PDF OCR Processor</h1>
-      <span class="version-label">v0.11</span>
+      <span class="version-label">v0.15 on 10july2025</span>
     </div>
 
     <div class="upload-section">
@@ -24,7 +24,7 @@
       <p v-if="totalPages > 0">Total Pages: {{ totalPages }}</p>
     </div>
 
-    <div v-if="totalPages > 0 && pageData.length > 0" class="page-status-container">
+    <!-- <div v-if="totalPages > 0 && pageData.length > 0" class="page-status-container">
       <h2>Page Processing Status</h2>
       <ul>
         <li v-for="page in pageData" :key="page.pageNum" :class="`status-${page.status}`">
@@ -32,7 +32,7 @@
           <span v-if="page.status === 'error'" class="page-error-details"> - Check console for details if any.</span>
         </li>
       </ul>
-    </div>
+    </div> -->
 
     <div class="content-display">
       <div class="pdf-viewer">

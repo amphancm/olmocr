@@ -1,0 +1,1023 @@
+supervisor: couldn't chdir to /home/ubuntu/olmocr/web_ui/backend: EACCES
+supervisor: child process was not spawned
+supervisor: couldn't chdir to /home/ubuntu/olmocr/web_ui/backend: EACCES
+supervisor: child process was not spawned
+supervisor: couldn't chdir to /home/ubuntu/olmocr/web_ui/backend: EACCES
+supervisor: child process was not spawned
+supervisor: couldn't chdir to /home/ubuntu/olmocr/web_ui/backend: EACCES
+supervisor: child process was not spawned
+supervisor: couldn't chdir to /home/ubuntu/olmocr/web_ui/backend: EACCES
+supervisor: child process was not spawned
+supervisor: couldn't chdir to /home/ubuntu/olmocr/web_ui/backend: EACCES
+supervisor: child process was not spawned
+supervisor: couldn't chdir to /home/ubuntu/olmocr/web_ui/backend: EACCES
+supervisor: child process was not spawned
+supervisor: couldn't chdir to /home/ubuntu/olmocr/web_ui/backend: EACCES
+supervisor: child process was not spawned
+[2025-07-10 07:28:54 +0000] [152952] [INFO] Starting gunicorn 23.0.0
+[2025-07-10 07:28:54 +0000] [152952] [INFO] Listening at: http://0.0.0.0:5000 (152952)
+[2025-07-10 07:28:54 +0000] [152952] [INFO] Using worker: sync
+[2025-07-10 07:28:54 +0000] [152953] [INFO] Booting worker with pid: 152953
+INFO:app:File 'รูปแบบ_หนังสือภายนอก_2.pdf' uploaded successfully to 'uploads/รูปแบบ_หนังสือภายนอก_2.pdf'
+INFO:app:PDF info for 'รูปแบบ_หนังสือภายนอก_2.pdf': 1 pages.
+INFO:app:Running OCR stream command: python -m olmocr.pipeline web_ui/backend/localworkspace --pdfs web_ui/backend/uploads/รูปแบบ_หนังสือภายนอก_2.pdf --model Adun/olmOCR-7B-thai-v3.2 --stream-json
+INFO:app:Executing from directory: /home/ubuntu/olmocr
+ERROR:app:Exception on /api/ocr-stream [POST]
+Traceback (most recent call last):
+  File "/opt/pytorch/lib/python3.12/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/pytorch/lib/python3.12/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/pytorch/lib/python3.12/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ^^^^^^^^^^^^^^^^^^
+  File "/opt/pytorch/lib/python3.12/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/pytorch/lib/python3.12/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/olmocr/web_ui/backend/app.py", line 205, in ocr_stream
+    process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, cwd=project_root, bufsize=1, universal_newlines=True)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/subprocess.py", line 1026, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+  File "/usr/local/lib/python3.12/subprocess.py", line 1955, in _execute_child
+    raise child_exception_type(errno_num, err_msg, err_filename)
+FileNotFoundError: [Errno 2] No such file or directory: 'python'
+INFO:app:File 'test0.013.pdf' uploaded successfully to 'uploads/test0.013.pdf'
+INFO:app:PDF info for 'test0.013.pdf': 1 pages.
+INFO:app:File 'รูปแบบ_หนังสือภายนอก_3.pdf' uploaded successfully to 'uploads/รูปแบบ_หนังสือภายนอก_3.pdf'
+INFO:app:PDF info for 'รูปแบบ_หนังสือภายนอก_3.pdf': 1 pages.
+INFO:app:Running OCR stream command: python -m olmocr.pipeline web_ui/backend/localworkspace --pdfs web_ui/backend/uploads/test0.013.pdf --model Adun/olmOCR-7B-thai-v3.2 --stream-json
+INFO:app:Executing from directory: /home/ubuntu/olmocr
+ERROR:app:Exception on /api/ocr-stream [POST]
+Traceback (most recent call last):
+  File "/opt/pytorch/lib/python3.12/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/pytorch/lib/python3.12/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/pytorch/lib/python3.12/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ^^^^^^^^^^^^^^^^^^
+  File "/opt/pytorch/lib/python3.12/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/pytorch/lib/python3.12/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/olmocr/web_ui/backend/app.py", line 205, in ocr_stream
+    process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, cwd=project_root, bufsize=1, universal_newlines=True)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/subprocess.py", line 1026, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+  File "/usr/local/lib/python3.12/subprocess.py", line 1955, in _execute_child
+    raise child_exception_type(errno_num, err_msg, err_filename)
+FileNotFoundError: [Errno 2] No such file or directory: 'python'
+[2025-07-10 07:35:27 +0000] [152952] [INFO] Handling signal: term
+[2025-07-10 07:35:27 +0000] [152953] [INFO] Worker exiting (pid: 152953)
+[2025-07-10 07:35:27 +0000] [152952] [INFO] Shutting down: Master
+[2025-07-10 07:35:32 +0000] [153032] [INFO] Starting gunicorn 23.0.0
+[2025-07-10 07:35:32 +0000] [153032] [INFO] Listening at: http://0.0.0.0:5000 (153032)
+[2025-07-10 07:35:32 +0000] [153032] [INFO] Using worker: sync
+[2025-07-10 07:35:32 +0000] [153033] [INFO] Booting worker with pid: 153033
+INFO:app:File 'รูปแบบ_หนังสือภายนอก_4.pdf' uploaded successfully to 'uploads/รูปแบบ_หนังสือภายนอก_4.pdf'
+INFO:app:PDF info for 'รูปแบบ_หนังสือภายนอก_4.pdf': 1 pages.
+INFO:app:Running OCR stream command: python3 -m olmocr.pipeline web_ui/backend/localworkspace --pdfs web_ui/backend/uploads/รูปแบบ_หนังสือภายนอก_4.pdf --model Adun/olmOCR-7B-thai-v3.2 --stream-json
+INFO:app:Executing from directory: /home/ubuntu/olmocr
+ERROR:app:OCR stream command failed for 'รูปแบบ_หนังสือภายนอก_4.pdf'. Return code: 1. Stderr: Traceback (most recent call last):
+  File "/usr/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/usr/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home/ubuntu/olmocr/olmocr/pipeline.py", line 24, in <module>
+    import boto3
+ModuleNotFoundError: No module named 'boto3'
+
+ERROR:app:Exception during OCR streaming for 'รูปแบบ_หนังสือภายนอก_4.pdf': name 'json' is not defined
+[2025-07-10 07:36:02 +0000] [153033] [ERROR] Error handling request /api/ocr-stream
+Traceback (most recent call last):
+  File "/home/ubuntu/olmocr/web_ui/backend/app.py", line 230, in generate_output
+    yield f"data: {json.dumps(error_event)}\n\n"
+                   ^^^^
+NameError: name 'json' is not defined. Did you forget to import 'json'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/opt/pytorch/lib/python3.12/site-packages/gunicorn/workers/sync.py", line 134, in handle
+    self.handle_request(listener, req, client, addr)
+  File "/opt/pytorch/lib/python3.12/site-packages/gunicorn/workers/sync.py", line 182, in handle_request
+    for item in respiter:
+                ^^^^^^^^
+  File "/opt/pytorch/lib/python3.12/site-packages/werkzeug/wsgi.py", line 256, in __next__
+    return self._next()
+           ^^^^^^^^^^^^
+  File "/opt/pytorch/lib/python3.12/site-packages/werkzeug/wrappers/response.py", line 32, in _iter_encoded
+    for item in iterable:
+                ^^^^^^^^
+  File "/opt/pytorch/lib/python3.12/site-packages/flask/helpers.py", line 125, in generator
+    yield from gen
+  File "/home/ubuntu/olmocr/web_ui/backend/app.py", line 240, in generate_output
+    yield f"data: {json.dumps(error_event)}\n\n"
+                   ^^^^
+NameError: name 'json' is not defined. Did you forget to import 'json'
+[2025-07-10 07:38:01 +0000] [153032] [INFO] Handling signal: term
+[2025-07-10 07:38:01 +0000] [153033] [INFO] Worker exiting (pid: 153033)
+[2025-07-10 07:38:01 +0000] [153032] [INFO] Shutting down: Master
+[2025-07-10 07:38:02 +0000] [153072] [INFO] Starting gunicorn 23.0.0
+[2025-07-10 07:38:02 +0000] [153072] [INFO] Listening at: http://0.0.0.0:5000 (153072)
+[2025-07-10 07:38:02 +0000] [153072] [INFO] Using worker: sync
+[2025-07-10 07:38:02 +0000] [153073] [INFO] Booting worker with pid: 153073
+INFO:app:File 'รูปแบบ_หนังสือภายนอก_5.pdf' uploaded successfully to 'uploads/รูปแบบ_หนังสือภายนอก_5.pdf'
+INFO:app:PDF info for 'รูปแบบ_หนังสือภายนอก_5.pdf': 1 pages.
+INFO:app:Running OCR stream command: python3 -m olmocr.pipeline web_ui/backend/localworkspace --pdfs web_ui/backend/uploads/รูปแบบ_หนังสือภายนอก_5.pdf --model Adun/olmOCR-7B-thai-v3.2 --stream-json
+INFO:app:Executing from directory: /home/ubuntu/olmocr
+ERROR:app:OCR stream command failed for 'รูปแบบ_หนังสือภายนอก_5.pdf'. Return code: 1. Stderr: Traceback (most recent call last):
+  File "/usr/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/usr/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home/ubuntu/olmocr/olmocr/pipeline.py", line 24, in <module>
+    import boto3
+ModuleNotFoundError: No module named 'boto3'
+
+ERROR:app:Exception during OCR streaming for 'รูปแบบ_หนังสือภายนอก_5.pdf': name 'json' is not defined
+[2025-07-10 07:38:29 +0000] [153073] [ERROR] Error handling request /api/ocr-stream
+Traceback (most recent call last):
+  File "/home/ubuntu/olmocr/web_ui/backend/app.py", line 230, in generate_output
+    yield f"data: {json.dumps(error_event)}\n\n"
+                   ^^^^
+NameError: name 'json' is not defined. Did you forget to import 'json'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/opt/pytorch/lib/python3.12/site-packages/gunicorn/workers/sync.py", line 134, in handle
+    self.handle_request(listener, req, client, addr)
+  File "/opt/pytorch/lib/python3.12/site-packages/gunicorn/workers/sync.py", line 182, in handle_request
+    for item in respiter:
+                ^^^^^^^^
+  File "/opt/pytorch/lib/python3.12/site-packages/werkzeug/wsgi.py", line 256, in __next__
+    return self._next()
+           ^^^^^^^^^^^^
+  File "/opt/pytorch/lib/python3.12/site-packages/werkzeug/wrappers/response.py", line 32, in _iter_encoded
+    for item in iterable:
+                ^^^^^^^^
+  File "/opt/pytorch/lib/python3.12/site-packages/flask/helpers.py", line 125, in generator
+    yield from gen
+  File "/home/ubuntu/olmocr/web_ui/backend/app.py", line 240, in generate_output
+    yield f"data: {json.dumps(error_event)}\n\n"
+                   ^^^^
+NameError: name 'json' is not defined. Did you forget to import 'json'
+[2025-07-10 07:39:34 +0000] [153072] [INFO] Handling signal: term
+[2025-07-10 07:39:34 +0000] [153073] [INFO] Worker exiting (pid: 153073)
+[2025-07-10 07:39:34 +0000] [153072] [INFO] Shutting down: Master
+[2025-07-10 07:39:34 +0000] [153082] [INFO] Starting gunicorn 23.0.0
+[2025-07-10 07:39:34 +0000] [153082] [INFO] Listening at: http://0.0.0.0:5000 (153082)
+[2025-07-10 07:39:34 +0000] [153082] [INFO] Using worker: sync
+[2025-07-10 07:39:34 +0000] [153083] [INFO] Booting worker with pid: 153083
+INFO:app:File 'รูปแบบ_หนังสือภายนอก_6.pdf' uploaded successfully to 'uploads/รูปแบบ_หนังสือภายนอก_6.pdf'
+INFO:app:PDF info for 'รูปแบบ_หนังสือภายนอก_6.pdf': 1 pages.
+INFO:app:Running OCR stream command: python3 -m olmocr.pipeline web_ui/backend/localworkspace --pdfs web_ui/backend/uploads/รูปแบบ_หนังสือภายนอก_6.pdf --model Adun/olmOCR-7B-thai-v3.2 --stream-json
+INFO:app:Executing from directory: /home/ubuntu/olmocr
+ERROR:app:OCR stream command failed for 'รูปแบบ_หนังสือภายนอก_6.pdf'. Return code: 1. Stderr: Traceback (most recent call last):
+  File "/usr/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/usr/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home/ubuntu/olmocr/olmocr/pipeline.py", line 24, in <module>
+    import boto3
+ModuleNotFoundError: No module named 'boto3'
+
+[2025-07-10 07:41:13 +0000] [153082] [INFO] Handling signal: term
+[2025-07-10 07:41:13 +0000] [153083] [INFO] Worker exiting (pid: 153083)
+[2025-07-10 07:41:13 +0000] [153082] [INFO] Shutting down: Master
+[2025-07-10 07:41:13 +0000] [153111] [INFO] Starting gunicorn 23.0.0
+[2025-07-10 07:41:13 +0000] [153111] [INFO] Listening at: http://0.0.0.0:5000 (153111)
+[2025-07-10 07:41:13 +0000] [153111] [INFO] Using worker: sync
+[2025-07-10 07:41:13 +0000] [153112] [INFO] Booting worker with pid: 153112
+INFO:app:File 'รูปแบบ_หนังสือภายนอก_7.pdf' uploaded successfully to 'uploads/รูปแบบ_หนังสือภายนอก_7.pdf'
+INFO:app:PDF info for 'รูปแบบ_หนังสือภายนอก_7.pdf': 1 pages.
+INFO:app:Running OCR stream command: python3 -m olmocr.pipeline web_ui/backend/localworkspace --pdfs web_ui/backend/uploads/รูปแบบ_หนังสือภายนอก_7.pdf --model Adun/olmOCR-7B-thai-v3.2 --stream-json
+INFO:app:Executing from directory: /home/ubuntu/olmocr
+ERROR:app:OCR stream command failed for 'รูปแบบ_หนังสือภายนอก_7.pdf'. Return code: 1. Stderr: Traceback (most recent call last):
+  File "/usr/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/usr/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home/ubuntu/olmocr/olmocr/pipeline.py", line 25, in <module>
+    import httpx
+ModuleNotFoundError: No module named 'httpx'
+
+[2025-07-10 07:42:04 +0000] [153111] [INFO] Handling signal: term
+[2025-07-10 07:42:04 +0000] [153112] [INFO] Worker exiting (pid: 153112)
+[2025-07-10 07:42:05 +0000] [153111] [INFO] Shutting down: Master
+[2025-07-10 07:42:05 +0000] [153126] [INFO] Starting gunicorn 23.0.0
+[2025-07-10 07:42:05 +0000] [153126] [INFO] Listening at: http://0.0.0.0:5000 (153126)
+[2025-07-10 07:42:05 +0000] [153126] [INFO] Using worker: sync
+[2025-07-10 07:42:05 +0000] [153127] [INFO] Booting worker with pid: 153127
+INFO:app:File 'รูปแบบ_หนังสือภายนอก_8.pdf' uploaded successfully to 'uploads/รูปแบบ_หนังสือภายนอก_8.pdf'
+INFO:app:PDF info for 'รูปแบบ_หนังสือภายนอก_8.pdf': 1 pages.
+INFO:app:Running OCR stream command: python3 -m olmocr.pipeline web_ui/backend/localworkspace --pdfs web_ui/backend/uploads/รูปแบบ_หนังสือภายนอก_8.pdf --model Adun/olmOCR-7B-thai-v3.2 --stream-json
+INFO:app:Executing from directory: /home/ubuntu/olmocr
+ERROR:app:OCR stream command failed for 'รูปแบบ_หนังสือภายนอก_8.pdf'. Return code: 1. Stderr: Traceback (most recent call last):
+  File "/usr/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/usr/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home/ubuntu/olmocr/olmocr/pipeline.py", line 26, in <module>
+    import torch
+ModuleNotFoundError: No module named 'torch'
+
+[2025-07-10 07:46:04 +0000] [153126] [INFO] Handling signal: term
+[2025-07-10 07:46:04 +0000] [153127] [INFO] Worker exiting (pid: 153127)
+[2025-07-10 07:46:04 +0000] [153126] [INFO] Shutting down: Master
+[2025-07-10 07:46:06 +0000] [153148] [INFO] Starting gunicorn 23.0.0
+[2025-07-10 07:46:06 +0000] [153148] [INFO] Listening at: http://0.0.0.0:5000 (153148)
+[2025-07-10 07:46:06 +0000] [153148] [INFO] Using worker: sync
+[2025-07-10 07:46:06 +0000] [153149] [INFO] Booting worker with pid: 153149
+[2025-07-10 07:46:42 +0000] [153148] [INFO] Handling signal: term
+[2025-07-10 07:46:42 +0000] [153149] [INFO] Worker exiting (pid: 153149)
+[2025-07-10 07:46:42 +0000] [153148] [INFO] Shutting down: Master
+[2025-07-10 07:46:42 +0000] [153245] [INFO] Starting gunicorn 23.0.0
+[2025-07-10 07:46:42 +0000] [153245] [INFO] Listening at: http://0.0.0.0:5000 (153245)
+[2025-07-10 07:46:42 +0000] [153245] [INFO] Using worker: sync
+[2025-07-10 07:46:42 +0000] [153246] [INFO] Booting worker with pid: 153246
+INFO:app:File 'รูปแบบ_หนังสือภายนอก_9.pdf' uploaded successfully to 'uploads/รูปแบบ_หนังสือภายนอก_9.pdf'
+INFO:app:PDF info for 'รูปแบบ_หนังสือภายนอก_9.pdf': 1 pages.
+INFO:app:Running OCR stream command: python3 -m olmocr.pipeline web_ui/backend/localworkspace --pdfs web_ui/backend/uploads/รูปแบบ_หนังสือภายนอก_9.pdf --model Adun/olmOCR-7B-thai-v3.2 --stream-json
+INFO:app:Executing from directory: /home/ubuntu/olmocr
+ERROR:app:OCR stream command failed for 'รูปแบบ_หนังสือภายนอก_9.pdf'. Return code: 1. Stderr: Traceback (most recent call last):
+  File "/usr/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/usr/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home/ubuntu/olmocr/olmocr/pipeline.py", line 26, in <module>
+    import torch
+ModuleNotFoundError: No module named 'torch'
+
+[2025-07-10 07:49:36 +0000] [153245] [INFO] Handling signal: term
+[2025-07-10 07:49:36 +0000] [153246] [INFO] Worker exiting (pid: 153246)
+[2025-07-10 07:49:37 +0000] [153245] [INFO] Shutting down: Master
+[2025-07-10 07:49:37 +0000] [153288] [INFO] Starting gunicorn 23.0.0
+[2025-07-10 07:49:37 +0000] [153288] [INFO] Listening at: http://0.0.0.0:5000 (153288)
+[2025-07-10 07:49:37 +0000] [153288] [INFO] Using worker: sync
+[2025-07-10 07:49:37 +0000] [153289] [INFO] Booting worker with pid: 153289
+INFO:app:File 'รูปแบบ_หนังสือภายนอก_10.pdf' uploaded successfully to 'uploads/รูปแบบ_หนังสือภายนอก_10.pdf'
+INFO:app:PDF info for 'รูปแบบ_หนังสือภายนอก_10.pdf': 1 pages.
+INFO:app:Running OCR stream command: python3 -m olmocr.pipeline web_ui/backend/localworkspace --pdfs web_ui/backend/uploads/รูปแบบ_หนังสือภายนอก_10.pdf --model Adun/olmOCR-7B-thai-v3.2 --stream-json
+INFO:app:Executing from directory: /home/ubuntu/olmocr
+ERROR:app:OCR stream command failed for 'รูปแบบ_หนังสือภายนอก_10.pdf'. Return code: 1. Stderr: Traceback (most recent call last):
+  File "/usr/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/usr/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home/ubuntu/olmocr/olmocr/pipeline.py", line 28, in <module>
+    from huggingface_hub import snapshot_download
+ModuleNotFoundError: No module named 'huggingface_hub'
+
+[2025-07-10 07:51:56 +0000] [153288] [INFO] Handling signal: term
+[2025-07-10 07:51:56 +0000] [153289] [INFO] Worker exiting (pid: 153289)
+[2025-07-10 07:51:56 +0000] [153288] [INFO] Shutting down: Master
+[2025-07-10 07:51:56 +0000] [153315] [INFO] Starting gunicorn 23.0.0
+[2025-07-10 07:51:56 +0000] [153315] [INFO] Listening at: http://0.0.0.0:5000 (153315)
+[2025-07-10 07:51:56 +0000] [153315] [INFO] Using worker: sync
+[2025-07-10 07:51:56 +0000] [153316] [INFO] Booting worker with pid: 153316
+INFO:app:File 'รูปแบบ_หนังสือภายนอก_11.pdf' uploaded successfully to 'uploads/รูปแบบ_หนังสือภายนอก_11.pdf'
+INFO:app:PDF info for 'รูปแบบ_หนังสือภายนอก_11.pdf': 1 pages.
+INFO:app:Running OCR stream command: python3 -m olmocr.pipeline web_ui/backend/localworkspace --pdfs web_ui/backend/uploads/รูปแบบ_หนังสือภายนอก_11.pdf --model Adun/olmOCR-7B-thai-v3.2 --stream-json
+INFO:app:Executing from directory: /home/ubuntu/olmocr
+ERROR:app:OCR stream command failed for 'รูปแบบ_หนังสือภายนอก_11.pdf'. Return code: 1. Stderr: Traceback (most recent call last):
+  File "/usr/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/usr/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home/ubuntu/olmocr/olmocr/pipeline.py", line 30, in <module>
+    from pypdf import PdfReader
+ModuleNotFoundError: No module named 'pypdf'
+
+[2025-07-10 07:53:03 +0000] [153315] [INFO] Handling signal: term
+[2025-07-10 07:53:03 +0000] [153316] [INFO] Worker exiting (pid: 153316)
+[2025-07-10 07:53:03 +0000] [153315] [INFO] Shutting down: Master
+[2025-07-10 07:53:04 +0000] [153335] [INFO] Starting gunicorn 23.0.0
+[2025-07-10 07:53:04 +0000] [153335] [INFO] Listening at: http://0.0.0.0:5000 (153335)
+[2025-07-10 07:53:04 +0000] [153335] [INFO] Using worker: sync
+[2025-07-10 07:53:04 +0000] [153336] [INFO] Booting worker with pid: 153336
+INFO:app:File 'รูปแบบ_หนังสือภายนอก_12.pdf' uploaded successfully to 'uploads/รูปแบบ_หนังสือภายนอก_12.pdf'
+INFO:app:PDF info for 'รูปแบบ_หนังสือภายนอก_12.pdf': 1 pages.
+INFO:app:Running OCR stream command: python3 -m olmocr.pipeline web_ui/backend/localworkspace --pdfs web_ui/backend/uploads/รูปแบบ_หนังสือภายนอก_12.pdf --model Adun/olmOCR-7B-thai-v3.2 --stream-json
+INFO:app:Executing from directory: /home/ubuntu/olmocr
+ERROR:app:OCR stream command failed for 'รูปแบบ_หนังสือภายนอก_12.pdf'. Return code: 1. Stderr: Traceback (most recent call last):
+  File "/usr/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/usr/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home/ubuntu/olmocr/olmocr/pipeline.py", line 39, in <module>
+    from olmocr.filter.filter import Language, PdfFilter
+  File "/home/ubuntu/olmocr/olmocr/filter/__init__.py", line 1, in <module>
+    from .filter import PdfFilter
+  File "/home/ubuntu/olmocr/olmocr/filter/filter.py", line 7, in <module>
+    from lingua import Language, LanguageDetectorBuilder
+ModuleNotFoundError: No module named 'lingua'
+
+[2025-07-10 07:56:36 +0000] [153335] [INFO] Handling signal: term
+[2025-07-10 07:56:36 +0000] [153336] [INFO] Worker exiting (pid: 153336)
+[2025-07-10 07:56:36 +0000] [153335] [INFO] Shutting down: Master
+[2025-07-10 07:56:37 +0000] [153362] [INFO] Starting gunicorn 23.0.0
+[2025-07-10 07:56:37 +0000] [153362] [INFO] Listening at: http://0.0.0.0:5000 (153362)
+[2025-07-10 07:56:37 +0000] [153362] [INFO] Using worker: sync
+[2025-07-10 07:56:37 +0000] [153363] [INFO] Booting worker with pid: 153363
+INFO:app:File 'รูปแบบ_หนังสือภายนอก_13.pdf' uploaded successfully to 'uploads/รูปแบบ_หนังสือภายนอก_13.pdf'
+INFO:app:PDF info for 'รูปแบบ_หนังสือภายนอก_13.pdf': 1 pages.
+INFO:app:Running OCR stream command: python3 -m olmocr.pipeline web_ui/backend/localworkspace --pdfs web_ui/backend/uploads/รูปแบบ_หนังสือภายนอก_13.pdf --model Adun/olmOCR-7B-thai-v3.2 --stream-json
+INFO:app:Executing from directory: /home/ubuntu/olmocr
+ERROR:app:OCR stream command failed for 'รูปแบบ_หนังสือภายนอก_13.pdf'. Return code: 1. Stderr: Traceback (most recent call last):
+  File "/usr/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/usr/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home/ubuntu/olmocr/olmocr/pipeline.py", line 39, in <module>
+    from olmocr.filter.filter import Language, PdfFilter
+  File "/home/ubuntu/olmocr/olmocr/filter/__init__.py", line 1, in <module>
+    from .filter import PdfFilter
+  File "/home/ubuntu/olmocr/olmocr/filter/filter.py", line 7, in <module>
+    from lingua import Language, LanguageDetectorBuilder
+ModuleNotFoundError: No module named 'lingua'
+
+[2025-07-10 07:57:23 +0000] [153362] [INFO] Handling signal: term
+[2025-07-10 07:57:23 +0000] [153363] [INFO] Worker exiting (pid: 153363)
+[2025-07-10 07:57:23 +0000] [153362] [INFO] Shutting down: Master
+[2025-07-10 07:57:24 +0000] [153383] [INFO] Starting gunicorn 23.0.0
+[2025-07-10 07:57:24 +0000] [153383] [INFO] Listening at: http://0.0.0.0:5000 (153383)
+[2025-07-10 07:57:24 +0000] [153383] [INFO] Using worker: sync
+[2025-07-10 07:57:24 +0000] [153384] [INFO] Booting worker with pid: 153384
+INFO:app:File 'รูปแบบ_หนังสือภายนอก_14.pdf' uploaded successfully to 'uploads/รูปแบบ_หนังสือภายนอก_14.pdf'
+INFO:app:PDF info for 'รูปแบบ_หนังสือภายนอก_14.pdf': 1 pages.
+INFO:app:Running OCR stream command: python3 -m olmocr.pipeline web_ui/backend/localworkspace --pdfs web_ui/backend/uploads/รูปแบบ_หนังสือภายนอก_14.pdf --model Adun/olmOCR-7B-thai-v3.2 --stream-json
+INFO:app:Executing from directory: /home/ubuntu/olmocr
+ERROR:app:OCR stream command failed for 'รูปแบบ_หนังสือภายนอก_14.pdf'. Return code: 1. Stderr: Traceback (most recent call last):
+  File "/usr/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/usr/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home/ubuntu/olmocr/olmocr/pipeline.py", line 43, in <module>
+    from olmocr.prompts.anchor import get_anchor_text
+  File "/home/ubuntu/olmocr/olmocr/prompts/anchor.py", line 10, in <module>
+    import ftfy
+ModuleNotFoundError: No module named 'ftfy'
+
+[2025-07-10 07:58:13 +0000] [153383] [INFO] Handling signal: term
+[2025-07-10 07:58:13 +0000] [153384] [INFO] Worker exiting (pid: 153384)
+[2025-07-10 07:58:13 +0000] [153383] [INFO] Shutting down: Master
+[2025-07-10 07:58:13 +0000] [153403] [INFO] Starting gunicorn 23.0.0
+[2025-07-10 07:58:13 +0000] [153403] [INFO] Listening at: http://0.0.0.0:5000 (153403)
+[2025-07-10 07:58:13 +0000] [153403] [INFO] Using worker: sync
+[2025-07-10 07:58:13 +0000] [153404] [INFO] Booting worker with pid: 153404
+INFO:app:File 'รูปแบบ_หนังสือภายนอก_15.pdf' uploaded successfully to 'uploads/รูปแบบ_หนังสือภายนอก_15.pdf'
+INFO:app:PDF info for 'รูปแบบ_หนังสือภายนอก_15.pdf': 1 pages.
+INFO:app:Running OCR stream command: python3 -m olmocr.pipeline web_ui/backend/localworkspace --pdfs web_ui/backend/uploads/รูปแบบ_หนังสือภายนอก_15.pdf --model Adun/olmOCR-7B-thai-v3.2 --stream-json
+INFO:app:Executing from directory: /home/ubuntu/olmocr
+ERROR:app:OCR stream command failed for 'รูปแบบ_หนังสือภายนอก_15.pdf'. Return code: 1. Stderr: Traceback (most recent call last):
+  File "/usr/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/usr/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home/ubuntu/olmocr/olmocr/pipeline.py", line 43, in <module>
+    from olmocr.prompts.anchor import get_anchor_text
+  File "/home/ubuntu/olmocr/olmocr/prompts/anchor.py", line 11, in <module>
+    import pypdfium2 as pdfium
+ModuleNotFoundError: No module named 'pypdfium2'
+
+[2025-07-10 08:00:03 +0000] [153403] [INFO] Handling signal: term
+[2025-07-10 08:00:03 +0000] [153404] [INFO] Worker exiting (pid: 153404)
+[2025-07-10 08:00:03 +0000] [153403] [INFO] Shutting down: Master
+[2025-07-10 08:00:03 +0000] [153424] [INFO] Starting gunicorn 23.0.0
+[2025-07-10 08:00:03 +0000] [153424] [INFO] Listening at: http://0.0.0.0:5000 (153424)
+[2025-07-10 08:00:03 +0000] [153424] [INFO] Using worker: sync
+[2025-07-10 08:00:03 +0000] [153425] [INFO] Booting worker with pid: 153425
+INFO:app:File 'รูปแบบ_หนังสือภายนอก_16.pdf' uploaded successfully to 'uploads/รูปแบบ_หนังสือภายนอก_16.pdf'
+INFO:app:PDF info for 'รูปแบบ_หนังสือภายนอก_16.pdf': 1 pages.
+INFO:app:Running OCR stream command: python3 -m olmocr.pipeline web_ui/backend/localworkspace --pdfs web_ui/backend/uploads/รูปแบบ_หนังสือภายนอก_16.pdf --model Adun/olmOCR-7B-thai-v3.2 --stream-json
+INFO:app:Executing from directory: /home/ubuntu/olmocr
+ERROR:app:OCR stream command failed for 'รูปแบบ_หนังสือภายนอก_16.pdf'. Return code: 1. Stderr: Traceback (most recent call last):
+  File "/usr/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/usr/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home/ubuntu/olmocr/olmocr/pipeline.py", line 44, in <module>
+    from olmocr.s3_utils import (
+  File "/home/ubuntu/olmocr/olmocr/s3_utils.py", line 16, in <module>
+    import zstandard as zstd
+ModuleNotFoundError: No module named 'zstandard'
+
+[2025-07-10 08:01:11 +0000] [153424] [INFO] Handling signal: term
+[2025-07-10 08:01:11 +0000] [153425] [INFO] Worker exiting (pid: 153425)
+[2025-07-10 08:01:11 +0000] [153424] [INFO] Shutting down: Master
+[2025-07-10 08:01:11 +0000] [153445] [INFO] Starting gunicorn 23.0.0
+[2025-07-10 08:01:11 +0000] [153445] [INFO] Listening at: http://0.0.0.0:5000 (153445)
+[2025-07-10 08:01:11 +0000] [153445] [INFO] Using worker: sync
+[2025-07-10 08:01:11 +0000] [153446] [INFO] Booting worker with pid: 153446
+INFO:app:File 'รูปแบบ_หนังสือภายนอก_17.pdf' uploaded successfully to 'uploads/รูปแบบ_หนังสือภายนอก_17.pdf'
+INFO:app:PDF info for 'รูปแบบ_หนังสือภายนอก_17.pdf': 1 pages.
+INFO:app:Running OCR stream command: python3 -m olmocr.pipeline web_ui/backend/localworkspace --pdfs web_ui/backend/uploads/รูปแบบ_หนังสือภายนอก_17.pdf --model Adun/olmOCR-7B-thai-v3.2 --stream-json
+INFO:app:Executing from directory: /home/ubuntu/olmocr
+ERROR:app:OCR stream command failed for 'รูปแบบ_หนังสือภายนอก_17.pdf'. Return code: 1. Stderr: Traceback (most recent call last):
+  File "/usr/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/usr/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home/ubuntu/olmocr/olmocr/pipeline.py", line 44, in <module>
+    from olmocr.s3_utils import (
+  File "/home/ubuntu/olmocr/olmocr/s3_utils.py", line 20, in <module>
+    from google.cloud import storage
+ModuleNotFoundError: No module named 'google'
+
+[2025-07-10 08:03:37 +0000] [153445] [INFO] Handling signal: term
+[2025-07-10 08:03:37 +0000] [153446] [INFO] Worker exiting (pid: 153446)
+[2025-07-10 08:03:37 +0000] [153445] [INFO] Shutting down: Master
+[2025-07-10 08:03:37 +0000] [153471] [INFO] Starting gunicorn 23.0.0
+[2025-07-10 08:03:37 +0000] [153471] [INFO] Listening at: http://0.0.0.0:5000 (153471)
+[2025-07-10 08:03:37 +0000] [153471] [INFO] Using worker: sync
+[2025-07-10 08:03:37 +0000] [153472] [INFO] Booting worker with pid: 153472
+INFO:app:File 'รูปแบบ_หนังสือภายนอก_18.pdf' uploaded successfully to 'uploads/รูปแบบ_หนังสือภายนอก_18.pdf'
+INFO:app:PDF info for 'รูปแบบ_หนังสือภายนอก_18.pdf': 1 pages.
+INFO:app:Running OCR stream command: python3 -m olmocr.pipeline web_ui/backend/localworkspace --pdfs web_ui/backend/uploads/รูปแบบ_หนังสือภายนอก_18.pdf --model Adun/olmOCR-7B-thai-v3.2 --stream-json
+INFO:app:Executing from directory: /home/ubuntu/olmocr
+ERROR:app:OCR stream command failed for 'รูปแบบ_หนังสือภายนอก_18.pdf'. Return code: 1. Stderr: INFO:olmocr.check:pdftoppm is installed and working.
+2025-07-10 08:03:57,221 - __main__ - INFO - Got --pdfs argument, going to add to the work queue
+2025-07-10 08:03:57,221 - __main__ - INFO - Loading file at web_ui/backend/uploads/รูปแบบ_หนังสือภายนอก_18.pdf as PDF document
+2025-07-10 08:03:57,221 - __main__ - INFO - Found 1 total pdf paths to add
+
+Sampling PDFs to calculate optimal length:   0%|          | 0/1 [00:00<?, ?it/s]
+Sampling PDFs to calculate optimal length: 100%|██████████| 1/1 [00:00<00:00, 511.06it/s]
+2025-07-10 08:03:57,224 - __main__ - INFO - Calculated items_per_group: 100 based on average pages per PDF: 1.00
+INFO:olmocr.work_queue:Found 1 total paths
+INFO:olmocr.work_queue:1 new paths to add to the workspace
+INFO:olmocr.work_queue:Created 1 new work groups
+ERROR:olmocr.check:Please make sure sglang is installed according to the latest instructions here: https://docs.sglang.ai/start/install.html
+ERROR:olmocr.check:Sglang needs to be installed with a separate command in order to find all dependencies properly.
+
+[2025-07-10 08:07:11 +0000] [153471] [INFO] Handling signal: term
+[2025-07-10 08:07:11 +0000] [153472] [INFO] Worker exiting (pid: 153472)
+[2025-07-10 08:07:11 +0000] [153471] [INFO] Shutting down: Master
+[2025-07-10 08:07:11 +0000] [153573] [INFO] Starting gunicorn 23.0.0
+[2025-07-10 08:07:11 +0000] [153573] [INFO] Listening at: http://0.0.0.0:5000 (153573)
+[2025-07-10 08:07:11 +0000] [153573] [INFO] Using worker: sync
+[2025-07-10 08:07:11 +0000] [153574] [INFO] Booting worker with pid: 153574
+INFO:app:File 'รูปแบบ_หนังสือภายนอก_19.pdf' uploaded successfully to 'uploads/รูปแบบ_หนังสือภายนอก_19.pdf'
+INFO:app:PDF info for 'รูปแบบ_หนังสือภายนอก_19.pdf': 1 pages.
+INFO:app:Running OCR stream command: python3 -m olmocr.pipeline web_ui/backend/localworkspace --pdfs web_ui/backend/uploads/รูปแบบ_หนังสือภายนอก_19.pdf --model Adun/olmOCR-7B-thai-v3.2 --stream-json
+INFO:app:Executing from directory: /home/ubuntu/olmocr
+ERROR:app:OCR stream command failed for 'รูปแบบ_หนังสือภายนอก_19.pdf'. Return code: 1. Stderr: INFO:olmocr.check:pdftoppm is installed and working.
+2025-07-10 08:07:37,038 - __main__ - INFO - Got --pdfs argument, going to add to the work queue
+2025-07-10 08:07:37,038 - __main__ - INFO - Loading file at web_ui/backend/uploads/รูปแบบ_หนังสือภายนอก_19.pdf as PDF document
+2025-07-10 08:07:37,038 - __main__ - INFO - Found 1 total pdf paths to add
+
+Sampling PDFs to calculate optimal length:   0%|          | 0/1 [00:00<?, ?it/s]
+Sampling PDFs to calculate optimal length: 100%|██████████| 1/1 [00:00<00:00, 508.03it/s]
+2025-07-10 08:07:37,041 - __main__ - INFO - Calculated items_per_group: 100 based on average pages per PDF: 1.00
+INFO:olmocr.work_queue:Found 1 total paths
+INFO:olmocr.work_queue:1 new paths to add to the workspace
+INFO:olmocr.work_queue:Created 1 new work groups
+2025-07-10 08:07:37,062 - __main__ - INFO - Starting pipeline with PID 153577
+2025-07-10 08:07:37,062 - __main__ - INFO - Downloading model with hugging face 'Adun/olmOCR-7B-thai-v3.2'
+
+Fetching 18 files:   0%|          | 0/18 [00:00<?, ?it/s]
+Fetching 18 files: 100%|██████████| 18/18 [00:00<00:00, 47156.45it/s]
+INFO:olmocr.work_queue:Initialized local queue with 2 work items
+2025-07-10 08:07:37,252 - __main__ - WARNING - Attempt 1: Please wait for sglang server to become ready...
+2025-07-10 08:07:38,280 - __main__ - WARNING - Attempt 2: Please wait for sglang server to become ready...
+2025-07-10 08:07:39,308 - __main__ - WARNING - Attempt 3: Please wait for sglang server to become ready...
+2025-07-10 08:07:40,337 - __main__ - WARNING - Attempt 4: Please wait for sglang server to become ready...
+2025-07-10 08:07:41,160 - __main__ - INFO - Traceback (most recent call last):
+2025-07-10 08:07:41,160 - __main__ - INFO -   File "/usr/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+2025-07-10 08:07:41,160 - __main__ - INFO -     return _run_code(code, main_globals, None,
+2025-07-10 08:07:41,161 - __main__ - INFO -   File "/usr/lib/python3.10/runpy.py", line 86, in _run_code
+2025-07-10 08:07:41,161 - __main__ - INFO -     exec(code, run_globals)
+2025-07-10 08:07:41,161 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/launch_server.py", line 6, in <module>
+2025-07-10 08:07:41,161 - __main__ - INFO -     from sglang.srt.entrypoints.http_server import launch_server
+2025-07-10 08:07:41,161 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/entrypoints/http_server.py", line 50, in <module>
+2025-07-10 08:07:41,161 - __main__ - INFO -     from sglang.srt.entrypoints.engine import _launch_subprocesses
+2025-07-10 08:07:41,161 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/entrypoints/engine.py", line 41, in <module>
+2025-07-10 08:07:41,161 - __main__ - INFO -     from sglang.srt.managers.data_parallel_controller import (
+2025-07-10 08:07:41,161 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/managers/data_parallel_controller.py", line 28, in <module>
+2025-07-10 08:07:41,161 - __main__ - INFO -     from sglang.srt.managers.io_struct import (
+2025-07-10 08:07:41,161 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/managers/io_struct.py", line 25, in <module>
+2025-07-10 08:07:41,161 - __main__ - INFO -     from sglang.srt.managers.schedule_batch import BaseFinishReason
+2025-07-10 08:07:41,162 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/managers/schedule_batch.py", line 48, in <module>
+2025-07-10 08:07:41,162 - __main__ - INFO -     from sglang.srt.configs.model_config import ModelConfig
+2025-07-10 08:07:41,162 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/configs/model_config.py", line 25, in <module>
+2025-07-10 08:07:41,162 - __main__ - INFO -     from sglang.srt.hf_transformers_utils import (
+2025-07-10 08:07:41,162 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/hf_transformers_utils.py", line 43, in <module>
+2025-07-10 08:07:41,162 - __main__ - INFO -     from sglang.srt.configs.internvl import InternVLChatConfig
+2025-07-10 08:07:41,162 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/configs/internvl.py", line 6, in <module>
+2025-07-10 08:07:41,162 - __main__ - INFO -     import sentencepiece as spm
+2025-07-10 08:07:41,162 - __main__ - INFO - ModuleNotFoundError: No module named 'sentencepiece'
+2025-07-10 08:07:41,365 - __main__ - WARNING - Attempt 5: Please wait for sglang server to become ready...
+2025-07-10 08:07:41,840 - __main__ - WARNING - SGLang server task ended
+2025-07-10 08:07:42,393 - __main__ - WARNING - Attempt 6: Please wait for sglang server to become ready...
+2025-07-10 08:07:43,422 - __main__ - WARNING - Attempt 7: Please wait for sglang server to become ready...
+2025-07-10 08:07:44,452 - __main__ - WARNING - Attempt 8: Please wait for sglang server to become ready...
+2025-07-10 08:07:45,485 - __main__ - WARNING - Attempt 9: Please wait for sglang server to become ready...
+2025-07-10 08:07:45,703 - __main__ - INFO - Traceback (most recent call last):
+2025-07-10 08:07:45,703 - __main__ - INFO -   File "/usr/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+2025-07-10 08:07:45,703 - __main__ - INFO -     return _run_code(code, main_globals, None,
+2025-07-10 08:07:45,704 - __main__ - INFO -   File "/usr/lib/python3.10/runpy.py", line 86, in _run_code
+2025-07-10 08:07:45,704 - __main__ - INFO -     exec(code, run_globals)
+2025-07-10 08:07:45,704 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/launch_server.py", line 6, in <module>
+2025-07-10 08:07:45,704 - __main__ - INFO -     from sglang.srt.entrypoints.http_server import launch_server
+2025-07-10 08:07:45,704 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/entrypoints/http_server.py", line 50, in <module>
+2025-07-10 08:07:45,704 - __main__ - INFO -     from sglang.srt.entrypoints.engine import _launch_subprocesses
+2025-07-10 08:07:45,704 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/entrypoints/engine.py", line 41, in <module>
+2025-07-10 08:07:45,704 - __main__ - INFO -     from sglang.srt.managers.data_parallel_controller import (
+2025-07-10 08:07:45,704 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/managers/data_parallel_controller.py", line 28, in <module>
+2025-07-10 08:07:45,704 - __main__ - INFO -     from sglang.srt.managers.io_struct import (
+2025-07-10 08:07:45,704 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/managers/io_struct.py", line 25, in <module>
+2025-07-10 08:07:45,704 - __main__ - INFO -     from sglang.srt.managers.schedule_batch import BaseFinishReason
+2025-07-10 08:07:45,705 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/managers/schedule_batch.py", line 48, in <module>
+2025-07-10 08:07:45,705 - __main__ - INFO -     from sglang.srt.configs.model_config import ModelConfig
+2025-07-10 08:07:45,705 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/configs/model_config.py", line 25, in <module>
+2025-07-10 08:07:45,705 - __main__ - INFO -     from sglang.srt.hf_transformers_utils import (
+2025-07-10 08:07:45,705 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/hf_transformers_utils.py", line 43, in <module>
+2025-07-10 08:07:45,705 - __main__ - INFO -     from sglang.srt.configs.internvl import InternVLChatConfig
+2025-07-10 08:07:45,705 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/configs/internvl.py", line 6, in <module>
+2025-07-10 08:07:45,705 - __main__ - INFO -     import sentencepiece as spm
+2025-07-10 08:07:45,705 - __main__ - INFO - ModuleNotFoundError: No module named 'sentencepiece'
+2025-07-10 08:07:46,370 - __main__ - WARNING - SGLang server task ended
+2025-07-10 08:07:46,526 - __main__ - WARNING - Attempt 10: Please wait for sglang server to become ready...
+2025-07-10 08:07:47,564 - __main__ - WARNING - Attempt 11: Please wait for sglang server to become ready...
+2025-07-10 08:07:48,593 - __main__ - WARNING - Attempt 12: Please wait for sglang server to become ready...
+2025-07-10 08:07:49,622 - __main__ - WARNING - Attempt 13: Please wait for sglang server to become ready...
+2025-07-10 08:07:50,227 - __main__ - INFO - Traceback (most recent call last):
+2025-07-10 08:07:50,227 - __main__ - INFO -   File "/usr/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+2025-07-10 08:07:50,227 - __main__ - INFO -     return _run_code(code, main_globals, None,
+2025-07-10 08:07:50,227 - __main__ - INFO -   File "/usr/lib/python3.10/runpy.py", line 86, in _run_code
+2025-07-10 08:07:50,227 - __main__ - INFO -     exec(code, run_globals)
+2025-07-10 08:07:50,228 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/launch_server.py", line 6, in <module>
+2025-07-10 08:07:50,228 - __main__ - INFO -     from sglang.srt.entrypoints.http_server import launch_server
+2025-07-10 08:07:50,228 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/entrypoints/http_server.py", line 50, in <module>
+2025-07-10 08:07:50,228 - __main__ - INFO -     from sglang.srt.entrypoints.engine import _launch_subprocesses
+2025-07-10 08:07:50,228 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/entrypoints/engine.py", line 41, in <module>
+2025-07-10 08:07:50,228 - __main__ - INFO -     from sglang.srt.managers.data_parallel_controller import (
+2025-07-10 08:07:50,228 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/managers/data_parallel_controller.py", line 28, in <module>
+2025-07-10 08:07:50,228 - __main__ - INFO -     from sglang.srt.managers.io_struct import (
+2025-07-10 08:07:50,228 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/managers/io_struct.py", line 25, in <module>
+2025-07-10 08:07:50,228 - __main__ - INFO -     from sglang.srt.managers.schedule_batch import BaseFinishReason
+2025-07-10 08:07:50,228 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/managers/schedule_batch.py", line 48, in <module>
+2025-07-10 08:07:50,228 - __main__ - INFO -     from sglang.srt.configs.model_config import ModelConfig
+2025-07-10 08:07:50,228 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/configs/model_config.py", line 25, in <module>
+2025-07-10 08:07:50,228 - __main__ - INFO -     from sglang.srt.hf_transformers_utils import (
+2025-07-10 08:07:50,228 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/hf_transformers_utils.py", line 43, in <module>
+2025-07-10 08:07:50,229 - __main__ - INFO -     from sglang.srt.configs.internvl import InternVLChatConfig
+2025-07-10 08:07:50,229 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/configs/internvl.py", line 6, in <module>
+2025-07-10 08:07:50,229 - __main__ - INFO -     import sentencepiece as spm
+2025-07-10 08:07:50,229 - __main__ - INFO - ModuleNotFoundError: No module named 'sentencepiece'
+2025-07-10 08:07:50,651 - __main__ - WARNING - Attempt 14: Please wait for sglang server to become ready...
+2025-07-10 08:07:50,917 - __main__ - WARNING - SGLang server task ended
+2025-07-10 08:07:51,681 - __main__ - WARNING - Attempt 15: Please wait for sglang server to become ready...
+2025-07-10 08:07:52,710 - __main__ - WARNING - Attempt 16: Please wait for sglang server to become ready...
+2025-07-10 08:07:53,739 - __main__ - WARNING - Attempt 17: Please wait for sglang server to become ready...
+2025-07-10 08:07:54,769 - __main__ - INFO - Traceback (most recent call last):
+2025-07-10 08:07:54,769 - __main__ - INFO -   File "/usr/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+2025-07-10 08:07:54,769 - __main__ - INFO -     return _run_code(code, main_globals, None,
+2025-07-10 08:07:54,769 - __main__ - INFO -   File "/usr/lib/python3.10/runpy.py", line 86, in _run_code
+2025-07-10 08:07:54,769 - __main__ - INFO -     exec(code, run_globals)
+2025-07-10 08:07:54,769 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/launch_server.py", line 6, in <module>
+2025-07-10 08:07:54,769 - __main__ - INFO -     from sglang.srt.entrypoints.http_server import launch_server
+2025-07-10 08:07:54,769 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/entrypoints/http_server.py", line 50, in <module>
+2025-07-10 08:07:54,769 - __main__ - INFO -     from sglang.srt.entrypoints.engine import _launch_subprocesses
+2025-07-10 08:07:54,769 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/entrypoints/engine.py", line 41, in <module>
+2025-07-10 08:07:54,769 - __main__ - INFO -     from sglang.srt.managers.data_parallel_controller import (
+2025-07-10 08:07:54,770 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/managers/data_parallel_controller.py", line 28, in <module>
+2025-07-10 08:07:54,770 - __main__ - INFO -     from sglang.srt.managers.io_struct import (
+2025-07-10 08:07:54,770 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/managers/io_struct.py", line 25, in <module>
+2025-07-10 08:07:54,770 - __main__ - INFO -     from sglang.srt.managers.schedule_batch import BaseFinishReason
+2025-07-10 08:07:54,770 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/managers/schedule_batch.py", line 48, in <module>
+2025-07-10 08:07:54,770 - __main__ - INFO -     from sglang.srt.configs.model_config import ModelConfig
+2025-07-10 08:07:54,770 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/configs/model_config.py", line 25, in <module>
+2025-07-10 08:07:54,770 - __main__ - INFO -     from sglang.srt.hf_transformers_utils import (
+2025-07-10 08:07:54,770 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/hf_transformers_utils.py", line 43, in <module>
+2025-07-10 08:07:54,770 - __main__ - INFO -     from sglang.srt.configs.internvl import InternVLChatConfig
+2025-07-10 08:07:54,770 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/configs/internvl.py", line 6, in <module>
+2025-07-10 08:07:54,770 - __main__ - INFO -     import sentencepiece as spm
+2025-07-10 08:07:54,770 - __main__ - INFO - ModuleNotFoundError: No module named 'sentencepiece'
+2025-07-10 08:07:54,771 - __main__ - WARNING - Attempt 18: Please wait for sglang server to become ready...
+2025-07-10 08:07:55,444 - __main__ - WARNING - SGLang server task ended
+2025-07-10 08:07:55,799 - __main__ - WARNING - Attempt 19: Please wait for sglang server to become ready...
+2025-07-10 08:07:56,827 - __main__ - WARNING - Attempt 20: Please wait for sglang server to become ready...
+2025-07-10 08:07:57,856 - __main__ - WARNING - Attempt 21: Please wait for sglang server to become ready...
+2025-07-10 08:07:58,885 - __main__ - WARNING - Attempt 22: Please wait for sglang server to become ready...
+2025-07-10 08:07:59,305 - __main__ - INFO - Traceback (most recent call last):
+2025-07-10 08:07:59,305 - __main__ - INFO -   File "/usr/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+2025-07-10 08:07:59,305 - __main__ - INFO -     return _run_code(code, main_globals, None,
+2025-07-10 08:07:59,305 - __main__ - INFO -   File "/usr/lib/python3.10/runpy.py", line 86, in _run_code
+2025-07-10 08:07:59,305 - __main__ - INFO -     exec(code, run_globals)
+2025-07-10 08:07:59,305 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/launch_server.py", line 6, in <module>
+2025-07-10 08:07:59,305 - __main__ - INFO -     from sglang.srt.entrypoints.http_server import launch_server
+2025-07-10 08:07:59,305 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/entrypoints/http_server.py", line 50, in <module>
+2025-07-10 08:07:59,305 - __main__ - INFO -     from sglang.srt.entrypoints.engine import _launch_subprocesses
+2025-07-10 08:07:59,305 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/entrypoints/engine.py", line 41, in <module>
+2025-07-10 08:07:59,305 - __main__ - INFO -     from sglang.srt.managers.data_parallel_controller import (
+2025-07-10 08:07:59,305 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/managers/data_parallel_controller.py", line 28, in <module>
+2025-07-10 08:07:59,306 - __main__ - INFO -     from sglang.srt.managers.io_struct import (
+2025-07-10 08:07:59,306 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/managers/io_struct.py", line 25, in <module>
+2025-07-10 08:07:59,306 - __main__ - INFO -     from sglang.srt.managers.schedule_batch import BaseFinishReason
+2025-07-10 08:07:59,306 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/managers/schedule_batch.py", line 48, in <module>
+2025-07-10 08:07:59,306 - __main__ - INFO -     from sglang.srt.configs.model_config import ModelConfig
+2025-07-10 08:07:59,306 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/configs/model_config.py", line 25, in <module>
+2025-07-10 08:07:59,306 - __main__ - INFO -     from sglang.srt.hf_transformers_utils import (
+2025-07-10 08:07:59,306 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/hf_transformers_utils.py", line 43, in <module>
+2025-07-10 08:07:59,306 - __main__ - INFO -     from sglang.srt.configs.internvl import InternVLChatConfig
+2025-07-10 08:07:59,306 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/configs/internvl.py", line 6, in <module>
+2025-07-10 08:07:59,306 - __main__ - INFO -     import sentencepiece as spm
+2025-07-10 08:07:59,306 - __main__ - INFO - ModuleNotFoundError: No module named 'sentencepiece'
+2025-07-10 08:07:59,916 - __main__ - WARNING - Attempt 23: Please wait for sglang server to become ready...
+2025-07-10 08:07:59,981 - __main__ - WARNING - SGLang server task ended
+2025-07-10 08:07:59,981 - __main__ - ERROR - Ended up starting the sglang server more than 5 times, cancelling pipeline
+2025-07-10 08:07:59,981 - __main__ - ERROR - 
+2025-07-10 08:07:59,981 - __main__ - ERROR - Please make sure sglang is installed according to the latest instructions here: https://docs.sglang.ai/start/install.html
+Exception ignored in atexit callback: <function sglang_server_task.<locals>._kill_proc at 0x7d7d8854dc60>
+Traceback (most recent call last):
+  File "/home/ubuntu/olmocr/olmocr/pipeline.py", line 664, in _kill_proc
+    proc.terminate()
+  File "/usr/lib/python3.10/asyncio/subprocess.py", line 140, in terminate
+    self._transport.terminate()
+  File "/usr/lib/python3.10/asyncio/base_subprocess.py", line 149, in terminate
+    self._check_proc()
+  File "/usr/lib/python3.10/asyncio/base_subprocess.py", line 142, in _check_proc
+    raise ProcessLookupError()
+ProcessLookupError: 
+Exception ignored in atexit callback: <function sglang_server_task.<locals>._kill_proc at 0x7d7d8850cf70>
+Traceback (most recent call last):
+  File "/home/ubuntu/olmocr/olmocr/pipeline.py", line 664, in _kill_proc
+    proc.terminate()
+  File "/usr/lib/python3.10/asyncio/subprocess.py", line 140, in terminate
+    self._transport.terminate()
+  File "/usr/lib/python3.10/asyncio/base_subprocess.py", line 149, in terminate
+    self._check_proc()
+  File "/usr/lib/python3.10/asyncio/base_subprocess.py", line 142, in _check_proc
+    raise ProcessLookupError()
+ProcessLookupError: 
+Exception ignored in atexit callback: <function sglang_server_task.<locals>._kill_proc at 0x7d7d8850cee0>
+Traceback (most recent call last):
+  File "/home/ubuntu/olmocr/olmocr/pipeline.py", line 664, in _kill_proc
+    proc.terminate()
+  File "/usr/lib/python3.10/asyncio/subprocess.py", line 140, in terminate
+    self._transport.terminate()
+  File "/usr/lib/python3.10/asyncio/base_subprocess.py", line 149, in terminate
+    self._check_proc()
+  File "/usr/lib/python3.10/asyncio/base_subprocess.py", line 142, in _check_proc
+    raise ProcessLookupError()
+ProcessLookupError: 
+Exception ignored in atexit callback: <function sglang_server_task.<locals>._kill_proc at 0x7d7d898db520>
+Traceback (most recent call last):
+  File "/home/ubuntu/olmocr/olmocr/pipeline.py", line 664, in _kill_proc
+    proc.terminate()
+  File "/usr/lib/python3.10/asyncio/subprocess.py", line 140, in terminate
+    self._transport.terminate()
+  File "/usr/lib/python3.10/asyncio/base_subprocess.py", line 149, in terminate
+    self._check_proc()
+  File "/usr/lib/python3.10/asyncio/base_subprocess.py", line 142, in _check_proc
+    raise ProcessLookupError()
+ProcessLookupError: 
+Exception ignored in atexit callback: <function sglang_server_task.<locals>._kill_proc at 0x7d7d897908b0>
+Traceback (most recent call last):
+  File "/home/ubuntu/olmocr/olmocr/pipeline.py", line 664, in _kill_proc
+    proc.terminate()
+  File "/usr/lib/python3.10/asyncio/subprocess.py", line 140, in terminate
+    self._transport.terminate()
+  File "/usr/lib/python3.10/asyncio/base_subprocess.py", line 149, in terminate
+    self._check_proc()
+  File "/usr/lib/python3.10/asyncio/base_subprocess.py", line 142, in _check_proc
+    raise ProcessLookupError()
+ProcessLookupError: 
+ERROR:asyncio:Task exception was never retrieved
+future: <Task finished name='Task-2' coro=<sglang_server_host() done, defined at /home/ubuntu/olmocr/olmocr/pipeline.py:743> exception=SystemExit(1)>
+Traceback (most recent call last):
+  File "/usr/lib/python3.10/asyncio/runners.py", line 44, in run
+    return loop.run_until_complete(main)
+  File "/usr/lib/python3.10/asyncio/base_events.py", line 636, in run_until_complete
+    self.run_forever()
+  File "/usr/lib/python3.10/asyncio/base_events.py", line 603, in run_forever
+    self._run_once()
+  File "/usr/lib/python3.10/asyncio/base_events.py", line 1909, in _run_once
+    handle._run()
+  File "/usr/lib/python3.10/asyncio/events.py", line 80, in _run
+    self._context.run(self._callback, *self._args)
+  File "/home/ubuntu/olmocr/olmocr/pipeline.py", line 756, in sglang_server_host
+    sys.exit(1)
+SystemExit: 1
+
+[2025-07-10 08:10:46 +0000] [153573] [INFO] Handling signal: term
+[2025-07-10 08:10:46 +0000] [153574] [INFO] Worker exiting (pid: 153574)
+[2025-07-10 08:10:46 +0000] [153573] [INFO] Shutting down: Master
+[2025-07-10 08:10:46 +0000] [153711] [INFO] Starting gunicorn 23.0.0
+[2025-07-10 08:10:46 +0000] [153711] [INFO] Listening at: http://0.0.0.0:5000 (153711)
+[2025-07-10 08:10:46 +0000] [153711] [INFO] Using worker: sync
+[2025-07-10 08:10:46 +0000] [153712] [INFO] Booting worker with pid: 153712
+INFO:app:File 'รูปแบบ_หนังสือภายนอก_20.pdf' uploaded successfully to 'uploads/รูปแบบ_หนังสือภายนอก_20.pdf'
+INFO:app:PDF info for 'รูปแบบ_หนังสือภายนอก_20.pdf': 1 pages.
+INFO:app:Running OCR stream command: python3 -m olmocr.pipeline web_ui/backend/localworkspace --pdfs web_ui/backend/uploads/รูปแบบ_หนังสือภายนอก_20.pdf --model Adun/olmOCR-7B-thai-v3.2 --stream-json
+INFO:app:Executing from directory: /home/ubuntu/olmocr
+ERROR:app:OCR stream command failed for 'รูปแบบ_หนังสือภายนอก_20.pdf'. Return code: 1. Stderr: INFO:olmocr.check:pdftoppm is installed and working.
+2025-07-10 08:11:09,038 - __main__ - INFO - Got --pdfs argument, going to add to the work queue
+2025-07-10 08:11:09,038 - __main__ - INFO - Loading file at web_ui/backend/uploads/รูปแบบ_หนังสือภายนอก_20.pdf as PDF document
+2025-07-10 08:11:09,038 - __main__ - INFO - Found 1 total pdf paths to add
+
+Sampling PDFs to calculate optimal length:   0%|          | 0/1 [00:00<?, ?it/s]
+Sampling PDFs to calculate optimal length: 100%|██████████| 1/1 [00:00<00:00, 518.90it/s]
+2025-07-10 08:11:09,041 - __main__ - INFO - Calculated items_per_group: 100 based on average pages per PDF: 1.00
+INFO:olmocr.work_queue:Found 1 total paths
+INFO:olmocr.work_queue:1 new paths to add to the workspace
+INFO:olmocr.work_queue:Created 1 new work groups
+2025-07-10 08:11:09,062 - __main__ - INFO - Starting pipeline with PID 153714
+2025-07-10 08:11:09,062 - __main__ - INFO - Downloading model with hugging face 'Adun/olmOCR-7B-thai-v3.2'
+
+Fetching 18 files:   0%|          | 0/18 [00:00<?, ?it/s]
+Fetching 18 files: 100%|██████████| 18/18 [00:00<00:00, 37881.32it/s]
+INFO:olmocr.work_queue:Initialized local queue with 3 work items
+2025-07-10 08:11:09,170 - __main__ - WARNING - Attempt 1: Please wait for sglang server to become ready...
+2025-07-10 08:11:10,211 - __main__ - WARNING - Attempt 2: Please wait for sglang server to become ready...
+2025-07-10 08:11:11,239 - __main__ - WARNING - Attempt 3: Please wait for sglang server to become ready...
+2025-07-10 08:11:12,266 - __main__ - WARNING - Attempt 4: Please wait for sglang server to become ready...
+2025-07-10 08:11:13,050 - __main__ - INFO - Traceback (most recent call last):
+2025-07-10 08:11:13,050 - __main__ - INFO -   File "/usr/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+2025-07-10 08:11:13,050 - __main__ - INFO -     return _run_code(code, main_globals, None,
+2025-07-10 08:11:13,051 - __main__ - INFO -   File "/usr/lib/python3.10/runpy.py", line 86, in _run_code
+2025-07-10 08:11:13,051 - __main__ - INFO -     exec(code, run_globals)
+2025-07-10 08:11:13,051 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/launch_server.py", line 6, in <module>
+2025-07-10 08:11:13,051 - __main__ - INFO -     from sglang.srt.entrypoints.http_server import launch_server
+2025-07-10 08:11:13,051 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/entrypoints/http_server.py", line 50, in <module>
+2025-07-10 08:11:13,051 - __main__ - INFO -     from sglang.srt.entrypoints.engine import _launch_subprocesses
+2025-07-10 08:11:13,051 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/entrypoints/engine.py", line 41, in <module>
+2025-07-10 08:11:13,051 - __main__ - INFO -     from sglang.srt.managers.data_parallel_controller import (
+2025-07-10 08:11:13,051 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/managers/data_parallel_controller.py", line 28, in <module>
+2025-07-10 08:11:13,051 - __main__ - INFO -     from sglang.srt.managers.io_struct import (
+2025-07-10 08:11:13,051 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/managers/io_struct.py", line 25, in <module>
+2025-07-10 08:11:13,051 - __main__ - INFO -     from sglang.srt.managers.schedule_batch import BaseFinishReason
+2025-07-10 08:11:13,051 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/managers/schedule_batch.py", line 48, in <module>
+2025-07-10 08:11:13,051 - __main__ - INFO -     from sglang.srt.configs.model_config import ModelConfig
+2025-07-10 08:11:13,052 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/configs/model_config.py", line 25, in <module>
+2025-07-10 08:11:13,052 - __main__ - INFO -     from sglang.srt.hf_transformers_utils import (
+2025-07-10 08:11:13,052 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/hf_transformers_utils.py", line 43, in <module>
+2025-07-10 08:11:13,052 - __main__ - INFO -     from sglang.srt.configs.internvl import InternVLChatConfig
+2025-07-10 08:11:13,052 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/configs/internvl.py", line 6, in <module>
+2025-07-10 08:11:13,052 - __main__ - INFO -     import sentencepiece as spm
+2025-07-10 08:11:13,052 - __main__ - INFO - ModuleNotFoundError: No module named 'sentencepiece'
+2025-07-10 08:11:13,293 - __main__ - WARNING - Attempt 5: Please wait for sglang server to become ready...
+2025-07-10 08:11:13,730 - __main__ - WARNING - SGLang server task ended
+2025-07-10 08:11:14,324 - __main__ - WARNING - Attempt 6: Please wait for sglang server to become ready...
+2025-07-10 08:11:15,353 - __main__ - WARNING - Attempt 7: Please wait for sglang server to become ready...
+2025-07-10 08:11:16,381 - __main__ - WARNING - Attempt 8: Please wait for sglang server to become ready...
+2025-07-10 08:11:17,409 - __main__ - WARNING - Attempt 9: Please wait for sglang server to become ready...
+2025-07-10 08:11:17,574 - __main__ - INFO - Traceback (most recent call last):
+2025-07-10 08:11:17,574 - __main__ - INFO -   File "/usr/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+2025-07-10 08:11:17,574 - __main__ - INFO -     return _run_code(code, main_globals, None,
+2025-07-10 08:11:17,574 - __main__ - INFO -   File "/usr/lib/python3.10/runpy.py", line 86, in _run_code
+2025-07-10 08:11:17,575 - __main__ - INFO -     exec(code, run_globals)
+2025-07-10 08:11:17,575 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/launch_server.py", line 6, in <module>
+2025-07-10 08:11:17,575 - __main__ - INFO -     from sglang.srt.entrypoints.http_server import launch_server
+2025-07-10 08:11:17,575 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/entrypoints/http_server.py", line 50, in <module>
+2025-07-10 08:11:17,575 - __main__ - INFO -     from sglang.srt.entrypoints.engine import _launch_subprocesses
+2025-07-10 08:11:17,575 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/entrypoints/engine.py", line 41, in <module>
+2025-07-10 08:11:17,575 - __main__ - INFO -     from sglang.srt.managers.data_parallel_controller import (
+2025-07-10 08:11:17,575 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/managers/data_parallel_controller.py", line 28, in <module>
+2025-07-10 08:11:17,575 - __main__ - INFO -     from sglang.srt.managers.io_struct import (
+2025-07-10 08:11:17,575 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/managers/io_struct.py", line 25, in <module>
+2025-07-10 08:11:17,575 - __main__ - INFO -     from sglang.srt.managers.schedule_batch import BaseFinishReason
+2025-07-10 08:11:17,575 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/managers/schedule_batch.py", line 48, in <module>
+2025-07-10 08:11:17,575 - __main__ - INFO -     from sglang.srt.configs.model_config import ModelConfig
+2025-07-10 08:11:17,575 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/configs/model_config.py", line 25, in <module>
+2025-07-10 08:11:17,575 - __main__ - INFO -     from sglang.srt.hf_transformers_utils import (
+2025-07-10 08:11:17,576 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/hf_transformers_utils.py", line 43, in <module>
+2025-07-10 08:11:17,576 - __main__ - INFO -     from sglang.srt.configs.internvl import InternVLChatConfig
+2025-07-10 08:11:17,576 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/configs/internvl.py", line 6, in <module>
+2025-07-10 08:11:17,576 - __main__ - INFO -     import sentencepiece as spm
+2025-07-10 08:11:17,576 - __main__ - INFO - ModuleNotFoundError: No module named 'sentencepiece'
+2025-07-10 08:11:18,243 - __main__ - WARNING - SGLang server task ended
+2025-07-10 08:11:18,436 - __main__ - WARNING - Attempt 10: Please wait for sglang server to become ready...
+2025-07-10 08:11:19,467 - __main__ - WARNING - Attempt 11: Please wait for sglang server to become ready...
+2025-07-10 08:11:20,495 - __main__ - WARNING - Attempt 12: Please wait for sglang server to become ready...
+2025-07-10 08:11:21,523 - __main__ - WARNING - Attempt 13: Please wait for sglang server to become ready...
+2025-07-10 08:11:22,102 - __main__ - INFO - Traceback (most recent call last):
+2025-07-10 08:11:22,102 - __main__ - INFO -   File "/usr/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+2025-07-10 08:11:22,102 - __main__ - INFO -     return _run_code(code, main_globals, None,
+2025-07-10 08:11:22,102 - __main__ - INFO -   File "/usr/lib/python3.10/runpy.py", line 86, in _run_code
+2025-07-10 08:11:22,102 - __main__ - INFO -     exec(code, run_globals)
+2025-07-10 08:11:22,102 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/launch_server.py", line 6, in <module>
+2025-07-10 08:11:22,102 - __main__ - INFO -     from sglang.srt.entrypoints.http_server import launch_server
+2025-07-10 08:11:22,102 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/entrypoints/http_server.py", line 50, in <module>
+2025-07-10 08:11:22,102 - __main__ - INFO -     from sglang.srt.entrypoints.engine import _launch_subprocesses
+2025-07-10 08:11:22,102 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/entrypoints/engine.py", line 41, in <module>
+2025-07-10 08:11:22,102 - __main__ - INFO -     from sglang.srt.managers.data_parallel_controller import (
+2025-07-10 08:11:22,103 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/managers/data_parallel_controller.py", line 28, in <module>
+2025-07-10 08:11:22,103 - __main__ - INFO -     from sglang.srt.managers.io_struct import (
+2025-07-10 08:11:22,103 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/managers/io_struct.py", line 25, in <module>
+2025-07-10 08:11:22,103 - __main__ - INFO -     from sglang.srt.managers.schedule_batch import BaseFinishReason
+2025-07-10 08:11:22,103 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/managers/schedule_batch.py", line 48, in <module>
+2025-07-10 08:11:22,103 - __main__ - INFO -     from sglang.srt.configs.model_config import ModelConfig
+2025-07-10 08:11:22,103 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/configs/model_config.py", line 25, in <module>
+2025-07-10 08:11:22,103 - __main__ - INFO -     from sglang.srt.hf_transformers_utils import (
+2025-07-10 08:11:22,103 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/hf_transformers_utils.py", line 43, in <module>
+2025-07-10 08:11:22,103 - __main__ - INFO -     from sglang.srt.configs.internvl import InternVLChatConfig
+2025-07-10 08:11:22,103 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/configs/internvl.py", line 6, in <module>
+2025-07-10 08:11:22,103 - __main__ - INFO -     import sentencepiece as spm
+2025-07-10 08:11:22,103 - __main__ - INFO - ModuleNotFoundError: No module named 'sentencepiece'
+2025-07-10 08:11:22,554 - __main__ - WARNING - Attempt 14: Please wait for sglang server to become ready...
+2025-07-10 08:11:22,778 - __main__ - WARNING - SGLang server task ended
+2025-07-10 08:11:23,584 - __main__ - WARNING - Attempt 15: Please wait for sglang server to become ready...
+2025-07-10 08:11:24,614 - __main__ - WARNING - Attempt 16: Please wait for sglang server to become ready...
+2025-07-10 08:11:25,643 - __main__ - WARNING - Attempt 17: Please wait for sglang server to become ready...
+2025-07-10 08:11:26,620 - __main__ - INFO - Traceback (most recent call last):
+2025-07-10 08:11:26,620 - __main__ - INFO -   File "/usr/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+2025-07-10 08:11:26,620 - __main__ - INFO -     return _run_code(code, main_globals, None,
+2025-07-10 08:11:26,620 - __main__ - INFO -   File "/usr/lib/python3.10/runpy.py", line 86, in _run_code
+2025-07-10 08:11:26,620 - __main__ - INFO -     exec(code, run_globals)
+2025-07-10 08:11:26,620 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/launch_server.py", line 6, in <module>
+2025-07-10 08:11:26,620 - __main__ - INFO -     from sglang.srt.entrypoints.http_server import launch_server
+2025-07-10 08:11:26,620 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/entrypoints/http_server.py", line 50, in <module>
+2025-07-10 08:11:26,621 - __main__ - INFO -     from sglang.srt.entrypoints.engine import _launch_subprocesses
+2025-07-10 08:11:26,621 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/entrypoints/engine.py", line 41, in <module>
+2025-07-10 08:11:26,621 - __main__ - INFO -     from sglang.srt.managers.data_parallel_controller import (
+2025-07-10 08:11:26,621 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/managers/data_parallel_controller.py", line 28, in <module>
+2025-07-10 08:11:26,621 - __main__ - INFO -     from sglang.srt.managers.io_struct import (
+2025-07-10 08:11:26,621 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/managers/io_struct.py", line 25, in <module>
+2025-07-10 08:11:26,621 - __main__ - INFO -     from sglang.srt.managers.schedule_batch import BaseFinishReason
+2025-07-10 08:11:26,621 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/managers/schedule_batch.py", line 48, in <module>
+2025-07-10 08:11:26,621 - __main__ - INFO -     from sglang.srt.configs.model_config import ModelConfig
+2025-07-10 08:11:26,621 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/configs/model_config.py", line 25, in <module>
+2025-07-10 08:11:26,621 - __main__ - INFO -     from sglang.srt.hf_transformers_utils import (
+2025-07-10 08:11:26,621 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/hf_transformers_utils.py", line 43, in <module>
+2025-07-10 08:11:26,621 - __main__ - INFO -     from sglang.srt.configs.internvl import InternVLChatConfig
+2025-07-10 08:11:26,621 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/configs/internvl.py", line 6, in <module>
+2025-07-10 08:11:26,621 - __main__ - INFO -     import sentencepiece as spm
+2025-07-10 08:11:26,621 - __main__ - INFO - ModuleNotFoundError: No module named 'sentencepiece'
+2025-07-10 08:11:26,672 - __main__ - WARNING - Attempt 18: Please wait for sglang server to become ready...
+2025-07-10 08:11:27,291 - __main__ - WARNING - SGLang server task ended
+2025-07-10 08:11:27,701 - __main__ - WARNING - Attempt 19: Please wait for sglang server to become ready...
+2025-07-10 08:11:28,731 - __main__ - WARNING - Attempt 20: Please wait for sglang server to become ready...
+2025-07-10 08:11:29,761 - __main__ - WARNING - Attempt 21: Please wait for sglang server to become ready...
+2025-07-10 08:11:30,789 - __main__ - WARNING - Attempt 22: Please wait for sglang server to become ready...
+2025-07-10 08:11:31,133 - __main__ - INFO - Traceback (most recent call last):
+2025-07-10 08:11:31,133 - __main__ - INFO -   File "/usr/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+2025-07-10 08:11:31,133 - __main__ - INFO -     return _run_code(code, main_globals, None,
+2025-07-10 08:11:31,133 - __main__ - INFO -   File "/usr/lib/python3.10/runpy.py", line 86, in _run_code
+2025-07-10 08:11:31,133 - __main__ - INFO -     exec(code, run_globals)
+2025-07-10 08:11:31,133 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/launch_server.py", line 6, in <module>
+2025-07-10 08:11:31,133 - __main__ - INFO -     from sglang.srt.entrypoints.http_server import launch_server
+2025-07-10 08:11:31,133 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/entrypoints/http_server.py", line 50, in <module>
+2025-07-10 08:11:31,134 - __main__ - INFO -     from sglang.srt.entrypoints.engine import _launch_subprocesses
+2025-07-10 08:11:31,134 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/entrypoints/engine.py", line 41, in <module>
+2025-07-10 08:11:31,134 - __main__ - INFO -     from sglang.srt.managers.data_parallel_controller import (
+2025-07-10 08:11:31,134 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/managers/data_parallel_controller.py", line 28, in <module>
+2025-07-10 08:11:31,134 - __main__ - INFO -     from sglang.srt.managers.io_struct import (
+2025-07-10 08:11:31,134 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/managers/io_struct.py", line 25, in <module>
+2025-07-10 08:11:31,134 - __main__ - INFO -     from sglang.srt.managers.schedule_batch import BaseFinishReason
+2025-07-10 08:11:31,134 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/managers/schedule_batch.py", line 48, in <module>
+2025-07-10 08:11:31,134 - __main__ - INFO -     from sglang.srt.configs.model_config import ModelConfig
+2025-07-10 08:11:31,134 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/configs/model_config.py", line 25, in <module>
+2025-07-10 08:11:31,134 - __main__ - INFO -     from sglang.srt.hf_transformers_utils import (
+2025-07-10 08:11:31,135 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/hf_transformers_utils.py", line 43, in <module>
+2025-07-10 08:11:31,135 - __main__ - INFO -     from sglang.srt.configs.internvl import InternVLChatConfig
+2025-07-10 08:11:31,135 - __main__ - INFO -   File "/usr/local/lib/python3.10/dist-packages/sglang/srt/configs/internvl.py", line 6, in <module>
+2025-07-10 08:11:31,135 - __main__ - INFO -     import sentencepiece as spm
+2025-07-10 08:11:31,135 - __main__ - INFO - ModuleNotFoundError: No module named 'sentencepiece'
+2025-07-10 08:11:31,819 - __main__ - WARNING - SGLang server task ended
+2025-07-10 08:11:31,819 - __main__ - ERROR - Ended up starting the sglang server more than 5 times, cancelling pipeline
+2025-07-10 08:11:31,819 - __main__ - ERROR - 
+2025-07-10 08:11:31,819 - __main__ - ERROR - Please make sure sglang is installed according to the latest instructions here: https://docs.sglang.ai/start/install.html
+Exception ignored in atexit callback: <function sglang_server_task.<locals>._kill_proc at 0x78850c549c60>
+Traceback (most recent call last):
+  File "/home/ubuntu/olmocr/olmocr/pipeline.py", line 664, in _kill_proc
+    proc.terminate()
+  File "/usr/lib/python3.10/asyncio/subprocess.py", line 140, in terminate
+    self._transport.terminate()
+  File "/usr/lib/python3.10/asyncio/base_subprocess.py", line 149, in terminate
+    self._check_proc()
+  File "/usr/lib/python3.10/asyncio/base_subprocess.py", line 142, in _check_proc
+    raise ProcessLookupError()
+ProcessLookupError: 
+Exception ignored in atexit callback: <function sglang_server_task.<locals>._kill_proc at 0x78850df78f70>
+Traceback (most recent call last):
+  File "/home/ubuntu/olmocr/olmocr/pipeline.py", line 664, in _kill_proc
+    proc.terminate()
+  File "/usr/lib/python3.10/asyncio/subprocess.py", line 140, in terminate
+    self._transport.terminate()
+  File "/usr/lib/python3.10/asyncio/base_subprocess.py", line 149, in terminate
+    self._check_proc()
+  File "/usr/lib/python3.10/asyncio/base_subprocess.py", line 142, in _check_proc
+    raise ProcessLookupError()
+ProcessLookupError: 
+Exception ignored in atexit callback: <function sglang_server_task.<locals>._kill_proc at 0x78850df78ee0>
+Traceback (most recent call last):
+  File "/home/ubuntu/olmocr/olmocr/pipeline.py", line 664, in _kill_proc
+    proc.terminate()
+  File "/usr/lib/python3.10/asyncio/subprocess.py", line 140, in terminate
+    self._transport.terminate()
+  File "/usr/lib/python3.10/asyncio/base_subprocess.py", line 149, in terminate
+    self._check_proc()
+  File "/usr/lib/python3.10/asyncio/base_subprocess.py", line 142, in _check_proc
+    raise ProcessLookupError()
+ProcessLookupError: 
+Exception ignored in atexit callback: <function sglang_server_task.<locals>._kill_proc at 0x788510bdb520>
+Traceback (most recent call last):
+  File "/home/ubuntu/olmocr/olmocr/pipeline.py", line 664, in _kill_proc
+    proc.terminate()
+  File "/usr/lib/python3.10/asyncio/subprocess.py", line 140, in terminate
+    self._transport.terminate()
+  File "/usr/lib/python3.10/asyncio/base_subprocess.py", line 149, in terminate
+    self._check_proc()
+  File "/usr/lib/python3.10/asyncio/base_subprocess.py", line 142, in _check_proc
+    raise ProcessLookupError()
+ProcessLookupError: 
+Exception ignored in atexit callback: <function sglang_server_task.<locals>._kill_proc at 0x788510a90d30>
+Traceback (most recent call last):
+  File "/home/ubuntu/olmocr/olmocr/pipeline.py", line 664, in _kill_proc
+    proc.terminate()
+  File "/usr/lib/python3.10/asyncio/subprocess.py", line 140, in terminate
+    self._transport.terminate()
+  File "/usr/lib/python3.10/asyncio/base_subprocess.py", line 149, in terminate
+    self._check_proc()
+  File "/usr/lib/python3.10/asyncio/base_subprocess.py", line 142, in _check_proc
+    raise ProcessLookupError()
+ProcessLookupError: 
+ERROR:asyncio:Task exception was never retrieved
+future: <Task finished name='Task-2' coro=<sglang_server_host() done, defined at /home/ubuntu/olmocr/olmocr/pipeline.py:743> exception=SystemExit(1)>
+Traceback (most recent call last):
+  File "/usr/lib/python3.10/asyncio/runners.py", line 44, in run
+    return loop.run_until_complete(main)
+  File "/usr/lib/python3.10/asyncio/base_events.py", line 636, in run_until_complete
+    self.run_forever()
+  File "/usr/lib/python3.10/asyncio/base_events.py", line 603, in run_forever
+    self._run_once()
+  File "/usr/lib/python3.10/asyncio/base_events.py", line 1909, in _run_once
+    handle._run()
+  File "/usr/lib/python3.10/asyncio/events.py", line 80, in _run
+    self._context.run(self._callback, *self._args)
+  File "/home/ubuntu/olmocr/olmocr/pipeline.py", line 756, in sglang_server_host
+    sys.exit(1)
+SystemExit: 1
+
+[2025-07-10 08:14:11 +0000] [153711] [INFO] Handling signal: term
+[2025-07-10 08:14:11 +0000] [153712] [INFO] Worker exiting (pid: 153712)
+[2025-07-10 08:14:11 +0000] [153711] [INFO] Shutting down: Master
+[2025-07-10 08:14:11 +0000] [153838] [INFO] Starting gunicorn 23.0.0
+[2025-07-10 08:14:11 +0000] [153838] [INFO] Listening at: http://0.0.0.0:5000 (153838)
+[2025-07-10 08:14:11 +0000] [153838] [INFO] Using worker: sync
+[2025-07-10 08:14:11 +0000] [153839] [INFO] Booting worker with pid: 153839
+INFO:app:File 'รูปแบบ_หนังสือภายนอก_21.pdf' uploaded successfully to 'uploads/รูปแบบ_หนังสือภายนอก_21.pdf'
+INFO:app:PDF info for 'รูปแบบ_หนังสือภายนอก_21.pdf': 1 pages.
+INFO:app:Running OCR stream command: python3 -m olmocr.pipeline web_ui/backend/localworkspace --pdfs web_ui/backend/uploads/รูปแบบ_หนังสือภายนอก_21.pdf --model Adun/olmOCR-7B-thai-v3.2 --stream-json
+INFO:app:Executing from directory: /home/ubuntu/olmocr
+[2025-07-10 08:15:01 +0000] [153838] [CRITICAL] WORKER TIMEOUT (pid:153839)
+[2025-07-10 08:15:01 +0000] [153839] [ERROR] Error handling request /api/ocr-stream
+Traceback (most recent call last):
+  File "/opt/pytorch/lib/python3.12/site-packages/gunicorn/workers/sync.py", line 134, in handle
+    self.handle_request(listener, req, client, addr)
+  File "/opt/pytorch/lib/python3.12/site-packages/gunicorn/workers/sync.py", line 182, in handle_request
+    for item in respiter:
+                ^^^^^^^^
+  File "/opt/pytorch/lib/python3.12/site-packages/werkzeug/wsgi.py", line 256, in __next__
+    return self._next()
+           ^^^^^^^^^^^^
+  File "/opt/pytorch/lib/python3.12/site-packages/werkzeug/wrappers/response.py", line 32, in _iter_encoded
+    for item in iterable:
+                ^^^^^^^^
+  File "/opt/pytorch/lib/python3.12/site-packages/flask/helpers.py", line 125, in generator
+    yield from gen
+  File "/home/ubuntu/olmocr/web_ui/backend/app.py", line 211, in generate_output
+    for line in iter(process.stdout.readline, ''):
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/pytorch/lib/python3.12/site-packages/gunicorn/workers/base.py", line 204, in handle_abort
+    sys.exit(1)
+SystemExit: 1
+[2025-07-10 08:15:01 +0000] [153839] [INFO] Worker exiting (pid: 153839)
+[2025-07-10 08:15:01 +0000] [154236] [INFO] Booting worker with pid: 154236
+[2025-07-10 08:21:25 +0000] [153838] [INFO] Handling signal: term
+[2025-07-10 08:21:25 +0000] [154236] [INFO] Worker exiting (pid: 154236)
+[2025-07-10 08:21:25 +0000] [153838] [INFO] Shutting down: Master
+[2025-07-10 08:21:26 +0000] [154363] [INFO] Starting gunicorn 23.0.0
+[2025-07-10 08:21:26 +0000] [154363] [INFO] Listening at: http://0.0.0.0:5000 (154363)
+[2025-07-10 08:21:26 +0000] [154363] [INFO] Using worker: sync
+[2025-07-10 08:21:26 +0000] [154364] [INFO] Booting worker with pid: 154364
+INFO:app:File 'รูปแบบ_หนังสือภายนอก_22.pdf' uploaded successfully to 'uploads/รูปแบบ_หนังสือภายนอก_22.pdf'
+INFO:app:PDF info for 'รูปแบบ_หนังสือภายนอก_22.pdf': 1 pages.
+INFO:app:Running OCR stream command: python3 -m olmocr.pipeline web_ui/backend/localworkspace --pdfs web_ui/backend/uploads/รูปแบบ_หนังสือภายนอก_22.pdf --model Adun/olmOCR-7B-thai-v3.2 --stream-json
+INFO:app:Executing from directory: /home/ubuntu/olmocr
+INFO:app:OCR stream command successful for 'รูปแบบ_หนังสือภายนอก_22.pdf'.
+INFO:app:Running OCR stream command: python3 -m olmocr.pipeline web_ui/backend/localworkspace --pdfs web_ui/backend/uploads/รูปแบบ_หนังสือภายนอก_22.pdf --model Adun/olmOCR-7B-thai-v3.2 --stream-json
+INFO:app:Executing from directory: /home/ubuntu/olmocr
+INFO:app:OCR stream command successful for 'รูปแบบ_หนังสือภายนอก_22.pdf'.
+INFO:app:File 'Scope.pdf' uploaded successfully to 'uploads/Scope.pdf'
+INFO:app:PDF info for 'Scope.pdf': 4 pages.
+INFO:app:Running OCR stream command: python3 -m olmocr.pipeline web_ui/backend/localworkspace --pdfs web_ui/backend/uploads/Scope.pdf --model Adun/olmOCR-7B-thai-v3.2 --stream-json
+INFO:app:Executing from directory: /home/ubuntu/olmocr
+INFO:app:OCR stream command successful for 'Scope.pdf'.
+[2025-07-10 08:28:03 +0000] [154363] [INFO] Handling signal: term
+[2025-07-10 08:28:03 +0000] [154364] [INFO] Worker exiting (pid: 154364)
+[2025-07-10 08:28:03 +0000] [154363] [INFO] Shutting down: Master

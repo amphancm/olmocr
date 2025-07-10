@@ -4,7 +4,7 @@ import subprocess
 from flask_cors import CORS
 from flask import Flask, request, jsonify, send_from_directory, Response, stream_with_context
 from pypdf import PdfReader # Added for reading PDF info
-
+import json
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -127,7 +127,7 @@ def ocr_file():
     # Command to be executed from project_root
     # Make sure the model name is correct and it's accessible
     command = [
-        "python", "-m", "olmocr.pipeline",
+        "python3", "-m", "olmocr.pipeline",
         olmocr_workspace_path,
         "--pdfs", pdf_file_path_for_command,
         "--model", "Adun/olmOCR-7B-thai-v3.2", 
@@ -192,7 +192,7 @@ def ocr_stream():
     pdf_file_path_for_command = os.path.join('web_ui', 'backend', UPLOAD_FOLDER, filename)
 
     command = [
-        "python", "-m", "olmocr.pipeline",
+        "python3", "-m", "olmocr.pipeline",
         olmocr_workspace_path,
         "--pdfs", pdf_file_path_for_command,
         "--model", "Adun/olmOCR-7B-thai-v3.2", # Consider making model configurable
