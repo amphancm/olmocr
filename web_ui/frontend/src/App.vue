@@ -1,6 +1,9 @@
 <template>
   <div id="app">
-    <h1>PDF OCR Processor</h1>
+    <div class="header-row">
+      <h1>PDF OCR Processor</h1>
+      <span class="version-label">v0.11</span>
+    </div>
 
     <div class="upload-section">
       <label for="file-input">Upload PDF:</label>
@@ -8,9 +11,14 @@
     </div>
 
     <div v-if="pdfFile" class="viewer-section">
-      <button @click="runOCR" :disabled="ocrRunning || !pdfUploaded">
-        {{ ocrRunning ? 'Processing...' : 'Run OCR' }}
-      </button>
+      <div style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+        <button @click="runOCR" :disabled="ocrRunning || !pdfUploaded">
+          {{ ocrRunning ? 'Processing...' : 'Run OCR' }}
+        </button>
+        <span v-if="showTimer" style="margin-left: 10px;">
+          Timer: {{ timerValue }}s
+        </span>
+      </div>
       <p v-if="uploadError" class="error-message">{{ uploadError }}</p>
       <p v-if="ocrError" class="error-message">OCR Error: {{ ocrError }}</p>
     </div>
@@ -42,6 +50,11 @@ const ocrText     = ref('');
 const ocrRunning  = ref(false);
 const uploadError = ref('');
 const ocrError    = ref('');
+
+// Timer related reactive variables
+const timerValue  = ref(0);
+const showTimer   = ref(false);
+let timerInterval = null; // To store the interval ID
 
 const FLASK_BASE_URL = 'https://deepseax.natachat.com'; // Assuming Flask runs on port 5000
 
@@ -107,6 +120,14 @@ const runOCR = async () => {
     return;
   }
 
+  // Start timer
+  showTimer.value = true;
+  timerValue.value = 0;
+  if (timerInterval) clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    timerValue.value++;
+  }, 1000);
+
   ocrRunning.value = true;
   ocrError.value   = '';
   ocrText.value    = '';
@@ -127,6 +148,12 @@ const runOCR = async () => {
     ocrText.value = ''; // Clear any partial OCR text if an error occurred
   } finally {
     ocrRunning.value = false;
+    // Stop timer
+    if (timerInterval) clearInterval(timerInterval);
+    timerInterval = null;
+    // Optionally, decide if showTimer should be set to false here or if the timer stays visible.
+    // For now, timer resets on next run. If you want to hide it:
+    // showTimer.value = false;
   }
 };
 
@@ -156,6 +183,26 @@ html, body, #app {
 h1 {
   text-align: center;
   margin-top: 20px;
+}
+
+.header-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 20px;
+  margin-bottom: 0;
+}
+
+.header-row h1 {
+  margin: 0;
+}
+
+.version-label {
+  font-size: 1.1em;
+  color: #888;
+  margin-left: 10px;
+  font-weight: normal;
 }
 
 .upload-section,
