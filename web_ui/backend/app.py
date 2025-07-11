@@ -1,10 +1,11 @@
 import os
+import json
 import logging
 import subprocess
 from flask_cors import CORS
 from flask import Flask, request, jsonify, send_from_directory, Response, stream_with_context
 from pypdf import PdfReader # Added for reading PDF info
-import json
+
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -75,7 +76,7 @@ def pdf_info(filename):
         return jsonify({"error": "PDF file not found"}), 404
 
     try:
-        reader = PdfReader(filepath)
+        reader    = PdfReader(filepath)
         num_pages = len(reader.pages)
         logger.info(f"PDF info for '{filename}': {num_pages} pages.")
         return jsonify({"filename": filename, "totalPages": num_pages}), 200
@@ -247,7 +248,6 @@ def ocr_stream():
             if process.poll() is None: # Check if process is still running
                 process.terminate()
                 process.wait()
-
 
     return Response(stream_with_context(generate_output()), content_type='text/event-stream')
 

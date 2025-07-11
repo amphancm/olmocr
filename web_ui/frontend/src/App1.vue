@@ -31,6 +31,16 @@
         <p v-if="totalPages > 0">Total Pages: {{ totalPages }}</p>
       </div>
 
+      <!-- <div v-if="totalPages > 0 && pageData.length > 0" class="page-status-container">
+        <h2>Page Processing Status</h2>
+        <ul>
+          <li v-for="page in pageData" :key="page.pageNum" :class="`status-${page.status}`">
+            Page {{ page.pageNum }}: {{ page.status }}
+            <span v-if="page.status === 'error'" class="page-error-details"> - Check console for details if any.</span>
+          </li>
+        </ul>
+      </div> -->
+
       <div class="content-display">
         <div class="pdf-viewer">
           <h2>PDF Preview</h2>
@@ -112,13 +122,13 @@ const uploadPdf = async () => {
       },
     });
     uploadedFilename.value = response.data.filename;
-    pdfUploaded.value      = true;
+    pdfUploaded.value = true;
     console.log('File uploaded:', response.data.filename);
 
     // Fetch PDF info (total pages)
     try {
       const infoResponse = await axios.get(`${FLASK_BASE_URL}/api/pdf-info/${response.data.filename}`);
-      totalPages.value   = infoResponse.data.totalPages;
+      totalPages.value = infoResponse.data.totalPages;
       // Initialize pageData based on totalPages
       pageData.value = Array.from({ length: totalPages.value }, (_, i) => ({
         pageNum: i + 1,
@@ -288,7 +298,7 @@ const runOCR = async () => {
         streamData(); // Continue reading
       }).catch(error => {
         console.error('Error reading from stream:', error);
-        ocrError.value   = `Stream reading error: ${error.message}`;
+        ocrError.value = `Stream reading error: ${error.message}`;
         ocrRunning.value = false;
         if (timerInterval) clearInterval(timerInterval); timerStatus.value = 'stopped';
          ocrCompleted.value = false; // Error in stream
@@ -298,10 +308,10 @@ const runOCR = async () => {
   })
   .catch(error => {
     console.error('Error setting up OCR stream:', error);
-    ocrError.value   = `Failed to start OCR: ${error.message}`;
+    ocrError.value = `Failed to start OCR: ${error.message}`;
     ocrRunning.value = false;
     if (timerInterval) clearInterval(timerInterval);
-    timerStatus.value  = 'stopped';
+    timerStatus.value = 'stopped';
     ocrCompleted.value = false; // Error setting up stream
   });
 };
@@ -368,10 +378,11 @@ const aggregatedOcrText = computed(() => {
 }
 
 
-html, body, #app {
+html, body {
   height: 100%;
   margin: 0;
   padding: 0;
+  overflow: hidden; /* Prevent scrollbars on body */
 }
 
 #app {
@@ -379,18 +390,19 @@ html, body, #app {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
-  min-height: 100vh;
-  min-width: 100vw;
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0 10px;
+  /* Ensure #app itself takes full viewport and is a flex container for its children */
   display: flex;
   flex-direction: column;
+  height: 100vh; /* Full viewport height */
+  width: 100vw; /* Full viewport width */
+  box-sizing: border-box;
+  margin: 0; /* Reset margin */
+  padding: 0; /* Reset padding, adjust child padding if needed */
 }
 
 h1 {
   text-align: center;
-  margin-top: 20px;
+  margin-top: 20px; /* This might need adjustment if header is part of full-screen */
 }
 
 .header-row {
@@ -398,8 +410,10 @@ h1 {
   align-items: center;
   justify-content: center;
   gap: 16px;
-  margin-top: 20px;
-  margin-bottom: 0;
+  /* margin-top: 20px; */ /* Removed or adjusted if part of full screen */
+  /* margin-bottom: 0; */
+  padding: 10px 0; /* Add some padding for the header */
+  flex-shrink: 0; /* Prevent header from shrinking */
 }
 
 .header-row h1 {
@@ -415,14 +429,17 @@ h1 {
 
 .upload-section,
 .viewer-section {
-  margin-bottom: 20px;
-  padding: 15px;
+  /* These sections might not be visible when content-display is full screen */
+  /* Or they become part of a scrollable area if content-display is not position:fixed */
+  margin-bottom: 10px; /* Reduced margin */
+  padding: 10px;
   border: 1px solid #ddd;
   border-radius: 5px;
   background-color: #f9f9f9;
   max-width: 600px;
   margin-left: auto;
   margin-right: auto;
+  flex-shrink: 0; /* Prevent these sections from shrinking */
 }
 
 .viewer-section {
@@ -460,54 +477,73 @@ h1 {
 
 .content-display {
   display: flex;
-  gap: 20px;
-  flex: 1 1 0;
-  min-height: 0;
-  margin-bottom: 20px;
+  gap: 0; /* No gap for full screen side-by-side */
+  flex-grow: 1; /* Allow content-display to take available space */
+  /* The following makes it "full screen" below the header/upload sections */
+  width: 100vw;
+  height: calc(100vh - 180px); /* Adjust 180px based on actual height of header and upload/viewer sections */
+  /* If you want .content-display to overlay everything (true full screen): */
+  /* position: fixed; */
+  /* top: 0; */
+  /* left: 0; */
+  /* width: 100vw; */
+  /* height: 100vh; */
+  /* z-index: 100; */ /* Ensure it's on top */
+  /* background-color: white; */ /* Or appropriate background */
+  box-sizing: border-box;
 }
 
 .pdf-viewer, .ocr-output {
-  flex: 1 1 0;
-  padding: 15px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  min-width: 0;
+  flex: 1 1 50%; /* Each takes 50% of the width */
+  padding: 0; /* Remove padding if it's truly edge-to-edge */
+  border: none; /* Remove border for seamless look */
+  border-radius: 0; /* No radius for full screen */
   background: #fff;
   display: flex;
   flex-direction: column;
+  height: 100%; /* Full height of parent (.content-display) */
+  box-sizing: border-box;
+}
+
+/* Add a border between pdf-viewer and ocr-output if desired */
+.pdf-viewer {
+  border-right: 1px solid #ccc; /* Example border */
 }
 
 .pdf-viewer h2, .ocr-output h2 {
-  margin-top: 0;
+  margin: 0;
+  padding: 10px; /* Add padding to titles */
   color: #333;
   border-bottom: 1px solid #eee;
-  padding-bottom: 10px;
-  margin-bottom: 15px;
+  /* padding-bottom: 10px; */
+  /* margin-bottom: 15px; */
+  flex-shrink: 0; /* Prevent titles from shrinking */
 }
 
 .ocr-output textarea {
   width: 100%;
-  height: 100%;
-  min-height: 200px;
+  height: 100%; /* Fill available space */
+  /* min-height: 200px; */ /* Not needed if height is 100% */
   box-sizing: border-box;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  border: none; /* Remove internal border */
+  border-radius: 0;
   padding: 10px;
   font-family: monospace;
-  resize: vertical;
-  flex: 1 1 0;
+  resize: none; /* Typically no resize for full-screen elements */
+  flex-grow: 1; /* Allow textarea to grow */
 }
 
 iframe {
-  border: 1px solid #ccc;
+  border: none; /* Remove iframe border */
   width: 100%;
-  height: 500px;
-  flex: 1 1 0;
+  height: 100%; /* Fill available space */
+  flex-grow: 1; /* Allow iframe to grow */
 }
 
 .error-message {
   color: red;
   margin-top: 10px;
+  padding: 0 10px; /* Ensure error messages have some padding */
 }
 
 .timer-running {
@@ -519,34 +555,43 @@ iframe {
 }
 
 /* Responsive Design */
-@media (max-width: 900px) {
+@media (max-width: 900px) { /* Tablet and Mobile */
   .content-display {
     flex-direction: column;
-    gap: 10px;
+    height: calc(100vh - 150px); /* Adjust height considering header for mobile */
+    /* If using position:fixed, these might not be needed or different */
   }
   .pdf-viewer, .ocr-output {
-    min-width: 0;
-    width: 100%;
+    flex-basis: 50%; /* Each takes 50% of the height */
+    width: 100%; /* Full width in column layout */
   }
-  iframe, .ocr-output textarea {
-    height: 300px;
+  .pdf-viewer {
+    border-right: none; /* Remove side border */
+    border-bottom: 1px solid #ccc; /* Add bottom border in column layout */
   }
+  /* iframe, .ocr-output textarea will naturally fill due to parent height */
 }
 
-@media (max-width: 600px) {
+@media (max-width: 600px) { /* Mobile specific adjustments */
   #app {
-    padding: 0 2px;
+    /* padding: 0 2px; */ /* Already handled by #app padding:0 */
   }
   .upload-section,
   .viewer-section {
-    padding: 10px;
+    /* padding: 10px; */ /* Already handled */
     max-width: 100%;
+    margin-bottom: 5px; /* Further reduce margin */
   }
-  .pdf-viewer, .ocr-output {
-    padding: 10px;
+  .pdf-viewer h2, .ocr-output h2 {
+    padding: 8px;
+    font-size: 1em;
   }
-  iframe, .ocr-output textarea {
-    height: 200px;
+  .ocr-output textarea, iframe {
+    padding: 5px; /* Reduce padding for smaller screens */
+  }
+  .content-display {
+     /* Adjust height based on potentially smaller header/upload sections on mobile */
+     height: calc(100vh - 120px); /* Example: further adjusted height */
   }
 }
 </style>

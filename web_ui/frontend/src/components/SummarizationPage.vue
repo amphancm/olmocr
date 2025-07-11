@@ -21,7 +21,7 @@ import { ref, defineEmits } from 'vue';
 
 const emit = defineEmits(['go-back']);
 
-const summaryText = ref('Placeholder summary text. This will be replaced with actual summarized content.');
+const summaryText    = ref('Placeholder summary text. This will be replaced with actual summarized content.');
 const predictionText = ref('Placeholder prediction text. This will be replaced with the model\'s prediction.');
 
 const goBack = () => {
