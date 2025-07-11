@@ -20,7 +20,7 @@
             {{ ocrRunning ? 'Processing...' : 'Run OCR' }}
           </button>
           <button @click="navigateToProcessPage" v-if="ocrCompleted && aggregatedOcrText" class="process-button" style="margin-left: 10px;">
-            Process Text
+            Summary and Prediction
           </button>
           <span v-if="showTimer" :class="timerStatus === 'running' ? 'timer-running' : 'timer-stopped'" style="margin-left: 10px;">
             Timer: {{ timerValue }}s
@@ -139,14 +139,14 @@ const uploadPdf = async () => {
       console.error('Error fetching PDF info:', infoError);
       uploadError.value += ` Could not fetch PDF info: ${infoError.response?.data?.error || infoError.message}.`;
       totalPages.value = 0;
-      pageData.value = [];
+      pageData.value   = [];
     }
 
   } catch (error) {
     console.error('Error uploading file:', error);
     pdfUploaded.value = false;
-    totalPages.value = 0;
-    pageData.value = [];
+    totalPages.value  = 0;
+    pageData.value    = [];
     if (error.response) {
       uploadError.value = `Upload failed: ${error.response.data.error || 'Server error'}`;
     } else {
@@ -164,8 +164,8 @@ const runOCR = async () => {
   }
 
   // Start timer
-  showTimer.value = true;
-  timerValue.value = 0;
+  showTimer.value   = true;
+  timerValue.value  = 0;
   timerStatus.value = 'running'; // Timer is now running
   if (timerInterval) clearInterval(timerInterval);
   timerInterval = setInterval(() => {
@@ -204,7 +204,7 @@ const runOCR = async () => {
       throw new Error('Response body is null, cannot read stream.');
     }
 
-    const reader = response.body.getReader();
+    const reader  = response.body.getReader();
     const decoder = new TextDecoder();
 
     function streamData() {

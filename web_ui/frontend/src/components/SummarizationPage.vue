@@ -1,6 +1,6 @@
 <template>
   <div class="summarization-page">
-    <h1>Text Processing Results</h1>
+    <h1>Summary and Prediction</h1>
 
     <div class="section">
       <h2>Summarization</h2>
