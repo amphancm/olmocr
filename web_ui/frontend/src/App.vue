@@ -1,57 +1,66 @@
 <template>
   <div id="app">
-    <div class="header-row">
-      <h1>PDF OCR Processor</h1>
-      <span class="version-label">v0.15 on 10july2025</span>
-    </div>
+    <!-- Conditionally render SummarizationPage or the main content -->
+    <SummarizationPage v-if="showSummarizationPage" @go-back="showSummarizationPage = false" />
 
-    <div class="upload-section">
-      <label for="file-input">Upload PDF:</label>
-      <input type="file" id="file-input" @change="handleFileChange" accept=".pdf" />
-    </div>
-
-    <div v-if="pdfFile" class="viewer-section">
-      <div style="display: flex; align-items: center; justify-content: center; gap: 10px;">
-        <button @click="runOCR" :disabled="ocrRunning || !pdfUploaded">
-          {{ ocrRunning ? 'Processing...' : 'Run OCR' }}
-        </button>
-        <span v-if="showTimer" :class="timerStatus === 'running' ? 'timer-running' : 'timer-stopped'" style="margin-left: 10px;">
-          Timer: {{ timerValue }}s
-        </span>
-      </div>
-      <p v-if="uploadError" class="error-message">{{ uploadError }}</p>
-      <p v-if="ocrError" class="error-message">OCR Error: {{ ocrError }}</p>
-      <p v-if="totalPages > 0">Total Pages: {{ totalPages }}</p>
-    </div>
-
-    <!-- <div v-if="totalPages > 0 && pageData.length > 0" class="page-status-container">
-      <h2>Page Processing Status</h2>
-      <ul>
-        <li v-for="page in pageData" :key="page.pageNum" :class="`status-${page.status}`">
-          Page {{ page.pageNum }}: {{ page.status }}
-          <span v-if="page.status === 'error'" class="page-error-details"> - Check console for details if any.</span>
-        </li>
-      </ul>
-    </div> -->
-
-    <div class="content-display">
-      <div class="pdf-viewer">
-        <h2>PDF Preview</h2>
-        <iframe v-if="pdfPreviewUrl" :src="pdfPreviewUrl" width="100%" height="500px"></iframe>
-        <p v-else>Select a PDF file to preview.</p>
+    <div v-else> <!-- Main OCR content -->
+      <div class="header-row">
+        <h1>PDF OCR Processor</h1>
+        <span class="version-label">v0.15 on 10july2025</span>
       </div>
 
-      <div class="ocr-output">
-        <h2>OCR Text</h2>
-        <textarea v-model="aggregatedOcrText" readonly placeholder="OCR output will appear here..."></textarea>
+      <div class="upload-section">
+        <label for="file-input">Upload PDF:</label>
+        <input type="file" id="file-input" @change="handleFileChange" accept=".pdf" />
       </div>
-    </div>
+
+      <div v-if="pdfFile" class="viewer-section">
+        <div style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+          <button @click="runOCR" :disabled="ocrRunning || !pdfUploaded">
+            {{ ocrRunning ? 'Processing...' : 'Run OCR' }}
+          </button>
+          <button @click="navigateToProcessPage" v-if="ocrCompleted && aggregatedOcrText" class="process-button" style="margin-left: 10px;">
+            Process Text
+          </button>
+          <span v-if="showTimer" :class="timerStatus === 'running' ? 'timer-running' : 'timer-stopped'" style="margin-left: 10px;">
+            Timer: {{ timerValue }}s
+          </span>
+        </div>
+        <p v-if="uploadError" class="error-message">{{ uploadError }}</p>
+        <p v-if="ocrError" class="error-message">OCR Error: {{ ocrError }}</p>
+        <p v-if="totalPages > 0">Total Pages: {{ totalPages }}</p>
+      </div>
+
+      <!-- <div v-if="totalPages > 0 && pageData.length > 0" class="page-status-container">
+        <h2>Page Processing Status</h2>
+        <ul>
+          <li v-for="page in pageData" :key="page.pageNum" :class="`status-${page.status}`">
+            Page {{ page.pageNum }}: {{ page.status }}
+            <span v-if="page.status === 'error'" class="page-error-details"> - Check console for details if any.</span>
+          </li>
+        </ul>
+      </div> -->
+
+      <div class="content-display">
+        <div class="pdf-viewer">
+          <h2>PDF Preview</h2>
+          <iframe v-if="pdfPreviewUrl" :src="pdfPreviewUrl" width="100%" height="500px"></iframe>
+          <p v-else>Select a PDF file to preview.</p>
+        </div>
+
+        <div class="ocr-output">
+          <h2>OCR Text</h2>
+          <textarea v-model="aggregatedOcrText" readonly placeholder="OCR output will appear here..."></textarea>
+        </div>
+      </div>
+    </div> <!-- End of Main OCR content -->
   </div>
 </template>
 
 <script setup>
 import { ref, computed } from 'vue'; // Import computed
 import axios from 'axios';
+import SummarizationPage from './components/SummarizationPage.vue'; // Import the new component
 
 const pdfFile       = ref(null);
 const pdfPreviewUrl = ref('');
@@ -59,8 +68,10 @@ const uploadedFilename = ref('');
 const pdfUploaded = ref(false);
 const ocrText     = ref('');
 const ocrRunning  = ref(false);
+const ocrCompleted = ref(false); // Added to track OCR completion for Process button
 const uploadError = ref('');
 const ocrError    = ref('');
+const showSummarizationPage = ref(false); // For conditional rendering
 
 // New reactive variables for multi-page handling
 const totalPages  = ref(0);
@@ -163,6 +174,7 @@ const runOCR = async () => {
 
   ocrRunning.value = true;
   ocrError.value = '';
+  ocrCompleted.value = false; // Reset before new OCR run
   // ocrText.value = ''; // This will be handled by aggregatedOcrText
 
   // Reset pageData statuses
@@ -203,6 +215,14 @@ const runOCR = async () => {
              ocrRunning.value = false;
              if (timerInterval) clearInterval(timerInterval);
              timerStatus.value = 'stopped';
+              // Set ocrCompleted to true if there's text and no critical error was flagged by summary
+              const successTextExists = pageData.value.some(p => (p.status === 'success' || p.status === 'success_fallback') && p.text && p.text.trim().length > 0);
+              if (successTextExists && !ocrError.value) { // Check ocrError in case summary already set it
+                 ocrCompleted.value = true;
+              } else if (!ocrError.value) { // If no text and no prior error, set a generic one
+                 ocrError.value = "OCR process finished, but no text was extracted or an error occurred before summary.";
+                 ocrCompleted.value = false;
+              }
           }
           return;
         }
@@ -249,11 +269,22 @@ const runOCR = async () => {
                   console.log('OCR Summary:', data);
                   if (data.status === 'error' || data.status === 'error_rate_exceeded' || data.total_errors > 0) {
                     if (!ocrError.value) ocrError.value = `OCR process completed with ${data.total_errors} errors. Status: ${data.status}.`;
+                     ocrCompleted.value = false; // OCR had errors or did not complete fully with text
+                   } else {
+                     // Check if there is actually text from successful pages
+                     const successTextExists = pageData.value.some(p => (p.status === 'success' || p.status === 'success_fallback') && p.text && p.text.trim().length > 0);
+                     if (successTextExists) {
+                         ocrCompleted.value = true;
+                     } else {
+                         ocrCompleted.value = false;
+                         if (!ocrError.value) ocrError.value = "OCR process finished, but no text was extracted.";
+                     }
                   }
                   ocrRunning.value = false; // Mark as not running once summary is received
                   if (timerInterval) clearInterval(timerInterval); timerStatus.value = 'stopped';
                 } else if (data.type === 'error') { // General stream error from backend
                   ocrError.value = data.message + (data.details ? ` Details: ${data.details}` : '');
+                   ocrCompleted.value = false;
                   ocrRunning.value = false;
                   if (timerInterval) clearInterval(timerInterval); timerStatus.value = 'stopped';
                   reader.cancel(); // Stop the stream
@@ -270,6 +301,7 @@ const runOCR = async () => {
         ocrError.value = `Stream reading error: ${error.message}`;
         ocrRunning.value = false;
         if (timerInterval) clearInterval(timerInterval); timerStatus.value = 'stopped';
+         ocrCompleted.value = false; // Error in stream
       });
     }
     streamData(); // Start reading the stream
@@ -280,7 +312,13 @@ const runOCR = async () => {
     ocrRunning.value = false;
     if (timerInterval) clearInterval(timerInterval);
     timerStatus.value = 'stopped';
++    ocrCompleted.value = false; // Error setting up stream
   });
+};
+
+const navigateToProcessPage = () => {
+  console.log('Navigating to process page...');
+  showSummarizationPage.value = true;
 };
 
 const aggregatedOcrText = computed(() => {
@@ -420,6 +458,14 @@ h1 {
 
 .viewer-section button:hover:not(:disabled) {
   background-color: #45a049;
+}
+
+.viewer-section .process-button {
+  background-color: #007bff; /* Blue */
+}
+
+.viewer-section .process-button:hover:not(:disabled) {
+  background-color: #0056b3; /* Darker Blue */
 }
 
 .content-display {
