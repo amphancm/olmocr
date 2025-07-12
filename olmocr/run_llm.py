@@ -85,9 +85,9 @@ async def main():
     inputs = tokenizer(prompt, return_tensors='pt', padding=True, truncation=True).to(model.device)
     outputs = model.generate(
         **inputs,
-        max_new_tokens=256,  # Limit the length of the summary
+        max_new_tokens=1024,  # Limit the length of the summary
         temperature=0.2,
-        repetition_penalty=1.1,
+        repetition_penalty=1.2,
         no_repeat_ngram_size=3
     )
 
