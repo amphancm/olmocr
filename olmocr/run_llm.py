@@ -75,7 +75,9 @@ async def main():
         return
 
     # Prepare the prompt
-    user_prompt = """
+    summary_prompt ="You are a helpful assistant that summarizes text."
+
+    user_summary_prompt = """
         โปรดอ่านและวิเคราะห์เอกสารทางราชการที่ได้รับเข้ามา และสรุปเนื้อหาให้ครอบคลุมประเด็นหลัก ดังตัวอย่างต่อไปนี้:\n
             เรื่อง/หัวข้อหลักของเอกสาร: เอกสารฉบับนี้เกี่ยวกับอะไร\n
             หน่วยงาน/ผู้ที่ออกเอกสาร: ใครเป็นผู้จัดทำหรือออกเอกสารฉบับนี้\n
@@ -86,8 +88,8 @@ async def main():
         """
 
     messages = [
-        {"role": "system", "content": "You are a helpful assistant that summarizes text."},
-        {"role": "user", "content": f"{user_prompt}\n\n{input_text}"}
+        {"role": "system", "content": f"{summary_prompt}"},
+        {"role": "user", "content": f"{user_summary_prompt}\n\n{input_text}"}
     ]
     prompt = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
 
