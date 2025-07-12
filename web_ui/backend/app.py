@@ -252,5 +252,59 @@ def ocr_stream():
     return Response(stream_with_context(generate_output()), content_type='text/event-stream')
 
 
+@app.route('/api/summarize', methods=['POST'])
+def summarize_text():
+    data = request.get_json()
+    if not data or 'text' not in data:
+        logger.warning("No text provided for summarization")
+        return jsonify({"error": "No text provided"}), 400
+
+    text_to_summarize = data['text']
+
+    # Define the path to the temporary file for the input text
+    input_filepath = os.path.join(app.config['UPLOAD_FOLDER'], 'temp_summarize_input.txt')
+
+    # Write the text to a temporary file
+    try:
+        with open(input_filepath, 'w') as f:
+            f.write(text_to_summarize)
+    except IOError as e:
+        logger.error(f"Error writing to temporary file: {e}")
+        return jsonify({"error": "Failed to process text for summarization"}), 500
+
+    project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+
+    # Command to execute the summarization script
+    absolute_input_filepath = os.path.abspath(input_filepath)
+    command = [
+        "python3", "-m", "olmocr.run_llm",
+        "--input_file", absolute_input_filepath
+    ]
+
+    logger.info(f"Running summarization command: {' '.join(command)}")
+
+    try:
+        # Execute the command from the project root
+        process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, cwd=project_root)
+        stdout, stderr = process.communicate(timeout=300)
+
+        if process.returncode == 0:
+            logger.info("Summarization command successful.")
+            return jsonify({"summary": stdout}), 200
+        else:
+            logger.error(f"Summarization command failed. Stderr: {stderr}")
+            return jsonify({"error": "Summarization failed", "details": stderr}), 500
+    except subprocess.TimeoutExpired:
+        logger.error("Summarization command timed out.")
+        process.kill()
+        return jsonify({"error": "Summarization timed out"}), 500
+    except Exception as e:
+        logger.error(f"Exception during summarization: {e}")
+        return jsonify({"error": f"An error occurred during summarization: {e}"}), 500
+    finally:
+        # Ensure the temporary file is cleaned up
+        if os.path.exists(input_filepath):
+            os.remove(input_filepath)
+
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

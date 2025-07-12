@@ -1,43 +1,56 @@
- 
-import os, torch
-
+import os
+import torch
 import argparse
 import asyncio
-
 from transformers import (
     AutoModelForCausalLM,
     AutoTokenizer,
     BitsAndBytesConfig,
-    pipeline,
-    logging,
 )
 
-#from IPython.display import Markdown, display
-
 import transformers
+
+# Suppress verbose logging from transformers
 transformers.logging.set_verbosity_error()
 
-device = "cuda" if torch.cuda.is_available() else "cpu"
-if torch.backends.mps.is_available():
-    device = "mps"
-print(f"Using device : {device}")
- 
-async def main():
- 
-    parser = argparse.ArgumentParser(description="Running LLM")
+def setup_device():
+    """Sets up and returns the appropriate device for torch."""
+    if torch.cuda.is_available():
+        return "cuda"
+    elif torch.backends.mps.is_available():
+        return "mps"
+    return "cpu"
 
-    parser.add_argument("--input", type=str, default="", help="")
-    parser.add_argument(
-        "--model",
-        help="",
-        default="unsloth/Llama-3.2-3B-Instruct",
-    )
+def get_input_text(args):
+    """Reads input text from a file or uses the direct text argument."""
+    if args.input_file:
+        try:
+            with open(args.input_file, 'r', encoding='utf-8') as f:
+                return f.read()
+        except FileNotFoundError:
+            print(f"Error: Input file not found at {args.input_file}")
+            return None
+    elif args.input_text:
+        return args.input_text
+    return None
+
+async def main():
+    device = setup_device()
+    # print(f"Using device: {device}")
+
+    parser = argparse.ArgumentParser(description="Running LLM for summarization")
+    parser.add_argument("--input_file", type=str, help="Path to the input text file.")
+    parser.add_argument("--input_text", type=str, help="Direct input text.")
+    parser.add_argument("--model", default="unsloth/Llama-3.2-3B-Instruct", help="Model to use for summarization.")
 
     args = parser.parse_args()
 
-    base_model   = args.model
+    input_text = get_input_text(args)
+    if not input_text:
+        print("Error: No input text provided. Use --input_file or --input_text.")
+        return
 
-    # QLoRA config
+    # Configuration for model quantization
     bnb_config = BitsAndBytesConfig(
         load_in_4bit=True,
         bnb_4bit_use_double_quant=True,
@@ -45,49 +58,48 @@ async def main():
         bnb_4bit_compute_dtype=torch.bfloat16
     )
 
-    # Load model
-    model = AutoModelForCausalLM.from_pretrained(
-        base_model,
-        quantization_config=bnb_config,
-        torch_dtype=torch.float16,
-        load_in_8bit=False,
-        device_map="auto",
-        attn_implementation="eager",
-    )
+    # Load model and tokenizer
+    try:
+        model = AutoModelForCausalLM.from_pretrained(
+            args.model,
+            quantization_config=bnb_config,
+            torch_dtype=torch.float16,
+            device_map="auto",
+            attn_implementation="eager",
+        )
+        tokenizer = AutoTokenizer.from_pretrained(args.model)
+        tokenizer.pad_token_id = tokenizer.eos_token_id
+        tokenizer.padding_side = "right"
+    except Exception as e:
+        print(f"Error loading model or tokenizer: {e}")
+        return
 
-    # Load tokenizer
-    tokenizer              = AutoTokenizer.from_pretrained(base_model)
-    tokenizer.pad_token_id = tokenizer.eos_token_id
-    tokenizer.padding_side = "right"
-
-    PAD_TOKEN = "<|pad|>"
-    tokenizer.add_special_tokens({"pad_token": PAD_TOKEN})
-
-    
+    # Prepare the prompt
     messages = [
-        
-        {"role": "system","content": "You are a friendly chatbot who always responds in the style of a programmer" },
-
-        {"role": "user", "content": {args.input}}   
+        {"role": "system", "content": "You are a helpful assistant that summarizes text."},
+        {"role": "user", "content": f"Please summarize the following text:\n\n{input_text}"}
     ]
+    prompt = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
 
-    prompt  = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
-
-    inputs  = tokenizer(prompt, return_tensors='pt', padding=True, truncation=True).to("cuda")
+    # Generate the summary
+    inputs = tokenizer(prompt, return_tensors='pt', padding=True, truncation=True).to(model.device)
     outputs = model.generate(
         **inputs,
-        max_length=2048,
-        num_return_sequences=1,
-        temperature=0.1,
-        repetition_penalty=1.2,
-        no_repeat_ngram_size=4
-        )
+        max_new_tokens=256,  # Limit the length of the summary
+        temperature=0.2,
+        repetition_penalty=1.1,
+        no_repeat_ngram_size=3
+    )
 
-    response    = tokenizer.decode(outputs[0], skip_special_tokens=True)
-    answer      = response.split("assistant")[1]
-    print(f"{answer}")
-    print(len(answer))
+    response = tokenizer.decode(outputs[0], skip_special_tokens=True)
 
+    # Extract only the assistant's part of the response
+    try:
+        # The split logic might need adjustment based on the exact model output format
+        answer = response.split("assistant\n")[-1].strip()
+        print(answer)
+    except IndexError:
+        print(response) # Fallback to printing the whole response if split fails
 
 if __name__ == "__main__":
     asyncio.run(main())

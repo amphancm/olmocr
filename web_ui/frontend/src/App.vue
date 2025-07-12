@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <!-- Conditionally render SummarizationPage or the main content -->
-    <SummarizationPage v-if="showSummarizationPage" @go-back="showSummarizationPage = false" />
+    <SummarizationPage v-if="showSummarizationPage" :ocrText="aggregatedOcrText" @go-back="showSummarizationPage = false" />
 
     <div v-else> <!-- Main OCR content -->
       <div class="header-row">

@@ -17,12 +17,41 @@
 </template>
 
 <script setup>
-import { ref, defineEmits } from 'vue';
+import { ref, onMounted, defineProps, defineEmits } from 'vue';
+import axios from 'axios';
+
+const props = defineProps({
+  ocrText: {
+    type: String,
+    required: true
+  }
+});
 
 const emit = defineEmits(['go-back']);
 
-const summaryText    = ref('Placeholder summary text. This will be replaced with actual summarized content.');
+const summaryText    = ref('Summarizing...');
 const predictionText = ref('Placeholder prediction text. This will be replaced with the model\'s prediction.');
+
+const summarizeContent = async () => {
+  if (!props.ocrText) {
+    summaryText.value = 'No OCR text available to summarize.';
+    return;
+  }
+
+  try {
+    const response = await axios.post('http://localhost:5000/api/summarize', {
+      text: props.ocrText
+    });
+    summaryText.value = response.data.summary;
+  } catch (error) {
+    console.error('Error summarizing text:', error);
+    summaryText.value = 'Failed to summarize text. Please check the console for more details.';
+  }
+};
+
+onMounted(() => {
+  summarizeContent();
+});
 
 const goBack = () => {
   emit('go-back');
