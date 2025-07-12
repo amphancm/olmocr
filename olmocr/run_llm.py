@@ -62,8 +62,8 @@ async def main():
     try:
         model = AutoModelForCausalLM.from_pretrained(
             args.model,
-            quantization_config=bnb_config,
             torch_dtype=torch.float16,
+            #quantization_config=bnb_config,
             device_map="auto",
             attn_implementation="eager",
         )
@@ -75,9 +75,19 @@ async def main():
         return
 
     # Prepare the prompt
+    user_prompt = """
+        โปรดอ่านและวิเคราะห์เอกสารทางราชการที่ได้รับเข้ามา และสรุปเนื้อหาให้ครอบคลุมประเด็นหลัก ดังตัวอย่างต่อไปนี้:\n
+            เรื่อง/หัวข้อหลักของเอกสาร: เอกสารฉบับนี้เกี่ยวกับอะไร\n
+            หน่วยงาน/ผู้ที่ออกเอกสาร: ใครเป็นผู้จัดทำหรือออกเอกสารฉบับนี้\n
+            วันที่ออกเอกสาร: เอกสารถูกออกเมื่อไหร่ (ถ้ามี)\n
+            วัตถุประสงค์หลัก: เอกสารนี้มีเจตนาเพื่ออะไร (เช่น แจ้งให้ทราบ, ขออนุมัติ, กำหนดแนวปฏิบัติ, สั่งการ)\n
+            สาระสำคัญ/ประเด็นหลักที่ต้องการสื่อสาร: ข้อมูลสำคัญที่สุดที่เอกสารต้องการแจ้งคืออะไร มีรายละเอียดอะไรบ้างที่จำเป็นต้องรู้\n
+            ข้อสรุป/การดำเนินการที่ต้องทำ (ถ้ามี): มีข้อสรุป หรือข้อกำหนดให้ดำเนินการอะไรต่อไปหรือไม่ ใครต้องทำอะไร อย่างไร
+        """
+
     messages = [
         {"role": "system", "content": "You are a helpful assistant that summarizes text."},
-        {"role": "user", "content": f"Please summarize the following text:\n\n{input_text}"}
+        {"role": "user", "content": f"{user_prompt}\n\n{input_text}"}
     ]
     prompt = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
 
@@ -86,7 +96,7 @@ async def main():
     outputs = model.generate(
         **inputs,
         max_new_tokens=1024,  # Limit the length of the summary
-        temperature=0.2,
+        temperature=0.1,
         repetition_penalty=1.2,
         no_repeat_ngram_size=3
     )
