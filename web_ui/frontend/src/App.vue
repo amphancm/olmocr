@@ -6,7 +6,7 @@
     <div v-else> <!-- Main OCR content -->
       <div class="header-row">
         <h1>PDF OCR Processor</h1>
-        <span class="version-label">v0.18 on 12july2025</span>
+        <span class="version-label">v0.19 on 13july2025</span>
       </div>
 
       <div class="upload-section">
