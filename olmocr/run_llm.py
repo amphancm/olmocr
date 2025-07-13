@@ -85,7 +85,7 @@ async def main():
 
     user_prediction_prompt="โปรดวิเคราะห์เอกสารที่ให้มาและระบุ หน่วยงานที่ควรส่งต่อเอกสารนี้ ที่เหมาะสมที่สุดเพียงหน่วยงานเดียว เฉพาะชื่อหน่วยงานเท่านั้น"
 
-    summary_prompt ="You are a helpful assistant that summarizes text."
+    summary_prompt      = "You are a helpful assistant that summarizes text."
 
     user_summary_prompt = """
         โปรดอ่านและวิเคราะห์เอกสารทางราชการที่ได้รับเข้ามา และสรุปเนื้อหาให้ครอบคลุมประเด็นหลัก ดังตัวอย่างต่อไปนี้:\n

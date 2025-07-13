@@ -162,8 +162,8 @@ const runOCR = async () => {
     timerValue.value++;
   }, 1000);
 
-  ocrRunning.value = true;
-  ocrError.value = '';
+  ocrRunning.value   = true;
+  ocrError.value     = '';
   ocrCompleted.value = false; // Reset before new OCR run
   // ocrText.value = ''; // This will be handled by aggregatedOcrText
 
