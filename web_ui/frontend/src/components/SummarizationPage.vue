@@ -30,7 +30,7 @@ const props = defineProps({
 const emit = defineEmits(['go-back']);
 
 const summaryText    = ref('Summarizing...');
-const predictionText = ref('Placeholder prediction text. This will be replaced with the model\'s prediction.');
+const predictionText = ref('Predicting...');
 
 const summarizeContent = async () => {
   if (!props.ocrText) {
@@ -51,7 +51,25 @@ const summarizeContent = async () => {
 
 onMounted(() => {
   summarizeContent();
+  predictContent();
 });
+
+const predictContent = async () => {
+  if (!props.ocrText) {
+    predictionText.value = 'No OCR text available to predict.';
+    return;
+  }
+
+  try {
+    const response = await axios.post('http://localhost:5000/api/predict', {
+      text: props.ocrText
+    });
+    predictionText.value = response.data.prediction;
+  } catch (error) {
+    console.error('Error predicting text:', error);
+    predictionText.value = 'Failed to predict text. Please check the console for more details.';
+  }
+};
 
 const goBack = () => {
   emit('go-back');

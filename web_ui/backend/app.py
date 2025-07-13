@@ -306,5 +306,61 @@ def summarize_text():
         if os.path.exists(input_filepath):
             os.remove(input_filepath)
 
+@app.route('/api/predict', methods=['POST'])
+def predict_text():
+    data = request.get_json()
+    if not data or 'text' not in data:
+        logger.warning("No text provided for prediction")
+        return jsonify({"error": "No text provided"}), 400
+
+    text_to_predict = data['text']
+
+    # Define the path to the temporary file for the input text
+    input_filepath = os.path.join(app.config['UPLOAD_FOLDER'], 'temp_predict_input.txt')
+
+    # Write the text to a temporary file
+    try:
+        with open(input_filepath, 'w') as f:
+            f.write(text_to_predict)
+    except IOError as e:
+        logger.error(f"Error writing to temporary file: {e}")
+        return jsonify({"error": "Failed to process text for prediction"}), 500
+
+    project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+
+    # Command to execute the prediction script
+    absolute_input_filepath = os.path.abspath(input_filepath)
+    command = [
+        "python3", "-m", "olmocr.run_llm",
+        "--input_file", absolute_input_filepath,
+        "--prediction"
+    ]
+
+    logger.info(f"Running prediction command: {' '.join(command)}")
+
+    try:
+        # Execute the command from the project root
+        process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, cwd=project_root)
+        stdout, stderr = process.communicate(timeout=300)
+
+        if process.returncode == 0:
+            logger.info("Prediction command successful.")
+            return jsonify({"prediction": stdout}), 200
+        else:
+            logger.error(f"Prediction command failed. Stderr: {stderr}")
+            return jsonify({"error": "Prediction failed", "details": stderr}), 500
+    except subprocess.TimeoutExpired:
+        logger.error("Prediction command timed out.")
+        process.kill()
+        return jsonify({"error": "Prediction timed out"}), 500
+    except Exception as e:
+        logger.error(f"Exception during prediction: {e}")
+        return jsonify({"error": f"An error occurred during prediction: {e}"}), 500
+    finally:
+        # Ensure the temporary file is cleaned up
+        if os.path.exists(input_filepath):
+            os.remove(input_filepath)
+
+
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
