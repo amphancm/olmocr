@@ -55,12 +55,12 @@ import SummarizationPage from './components/SummarizationPage.vue'; // Import th
 const pdfFile       = ref(null);
 const pdfPreviewUrl = ref('');
 const uploadedFilename = ref('');
-const pdfUploaded = ref(false);
-const ocrText     = ref('');
-const ocrRunning  = ref(false);
+const pdfUploaded  = ref(false);
+const ocrText      = ref('');
+const ocrRunning   = ref(false);
 const ocrCompleted = ref(false); // Added to track OCR completion for Process button
-const uploadError = ref('');
-const ocrError    = ref('');
+const uploadError  = ref('');
+const ocrError     = ref('');
 const showSummarizationPage = ref(false); // For conditional rendering
 
 // New reactive variables for multi-page handling
