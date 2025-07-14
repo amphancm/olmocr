@@ -42,8 +42,9 @@ async def main():
     parser.add_argument("--input_file", type=str, help="Path to the input text file.")
     parser.add_argument("--input_text", type=str, help="Direct input text.")
     parser.add_argument("--model", default="unsloth/Llama-3.2-3B-Instruct", help="Model to use for summarization.")
+    #parser.add_argument("--model", default="unsloth/Meta-Llama-3.1-8B-Instruct", help="Model to use for summarization.")
     parser.add_argument("--prediction", action="store_true", help="Enable prediction mode.")
-
+    
     args = parser.parse_args()
 
     input_text = get_input_text(args)
@@ -76,14 +77,14 @@ async def main():
         return
 
     # Prepare the prompt
-    system_prediction_prompt='''คุณคือผู้เชี่ยวชาญด้านการจำแนกเอกสาร โดยมีหน้าที่วิเคราะห์เนื้อหาของเอกสารที่ได้รับเข้ามา และระบุว่าควรส่งต่อไปยังหน่วยงานใดจากรายการต่อไปนี้:\n
+    system_prediction_prompt='''คุณคือผู้เชี่ยวชาญด้านการจำแนกเอกสารราชการทางการทหาร ถ้าไม่ใช่เอกสารทางการทหารหรือกองทัพ ให้แจ้งว่าเป็นเอกสาร ประเภทอื่นๆ ไม่ใช่เอกสารทางราชการทหาร ถ้าเป็นเอกสารทางการทหาร ให้ทำหน้าที่วิเคราะห์เนื้อหาของเอกสารที่ได้รับเข้ามา และระบุว่าควรส่งต่อไปยังหน่วยงานใดจากรายการต่อไปนี้:\n
         กองแผนและโครงการ: รับผิดชอบเอกสารเกี่ยวกับการวางแผน, โครงการพัฒนา, นโยบาย, แผนยุทธศาสตร์, การสำรวจความเป็นไปได้ของโครงการ, และการประเมินผลโครงการ\n
         กองเขตแดน: รับผิดชอบเอกสารเกี่ยวกับเขตแดน, การปักปันเขตแดน, สนธิสัญญาที่เกี่ยวข้องกับเขตแดน, ปัญหาข้อพิพาทเขตแดน, และการเจรจาชายแดน\n
         กองบิน: รับผิดชอบเอกสารเกี่ยวกับการบิน, อากาศยาน, น่านฟ้า, การควบคุมการจราจรทางอากาศ, กฎระเบียบการบิน, และการดำเนินการด้านการบินพลเรือนหรือทหาร\n
         แผนกงบประมาณ: รับผิดชอบเอกสารที่เกี่ยวข้องกับงบประมาณ, การจัดสรรงบประมาณ, การเบิกจ่าย, การตรวจสอบทางการเงิน, รายรับ-รายจ่าย, และการจัดทำประมาณการทางการเงิน\n
         ศูนย์ข้อมูล: รับผิดชอบเอกสารเกี่ยวกับการจัดการข้อมูล, ฐานข้อมูล, ระบบสารสนเทศ, การประมวลผลข้อมูล, การจัดเก็บข้อมูล, การวิเคราะห์ข้อมูล, และความปลอดภัยของข้อมูล'''
 
-    user_prediction_prompt="โปรดวิเคราะห์เอกสารที่ให้มาและระบุ หน่วยงานที่ควรส่งต่อเอกสารนี้ ที่เหมาะสมที่สุดเพียงหน่วยงานเดียว เฉพาะชื่อหน่วยงานเท่านั้น"
+    user_prediction_prompt="โปรดวิเคราะห์เอกสารที่ให้มาและระบุ หน่วยงานที่ควรส่งต่อเอกสารนี้ ตามชื่อ กองแผนและโครงการ, กองเขตแดน, กองบิน, แผนกงบประมาณ, ศูนย์ข้อมูล นี้เท่านั้น  ถ้าไม่ใช่เอกสารทางราชการทหาร ให้แจ้งว่าเป็นเอกสารประเภทอื่นๆ ไม่ใช่เอกสารทางราชการทหาร"
 
     summary_prompt      = "You are a helpful assistant that summarizes text."
 
@@ -102,15 +103,18 @@ async def main():
             {"role": "system", "content": f"{system_prediction_prompt}"},
             {"role": "user", "content": f"{user_prediction_prompt}\n\n{input_text}"}
         ]
+        
     else:
         messages = [
             {"role": "system", "content": f"{summary_prompt}"},
             {"role": "user", "content": f"{user_summary_prompt}\n\n{input_text}"}
         ]
+    
     prompt = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
 
     # Generate the summary
     inputs = tokenizer(prompt, return_tensors='pt', padding=True, truncation=True).to(model.device)
+    
     outputs = model.generate(
         **inputs,
         max_new_tokens=1024,  # Limit the length of the summary
@@ -118,6 +122,7 @@ async def main():
         repetition_penalty=1.2,
         no_repeat_ngram_size=3
     )
+    
 
     response = tokenizer.decode(outputs[0], skip_special_tokens=True)
 
