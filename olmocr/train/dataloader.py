@@ -832,7 +832,6 @@ if __name__ == "__main__":
         type=str,
         help="Save the processed image to the specified file path (e.g., output.png)",
     )
-    return dataset
 
     args = parser.parse_args()
 
@@ -893,15 +892,6 @@ if __name__ == "__main__":
             print(f"\nError: Sample index {args.sample_index} out of range. Only {len(dataset)} samples available.")
             exit(1)
 
-    # Define the download function to use in parallel processing
-    def cache_file(example):
-        s3_path = example["s3_path"]
-        if s3_path:
-            # Download the file and cache it locally
-            #local_path = _cache_s3_file(s3_path, pdf_cache_location)
-            #return {"local_pdf_path": local_path}
-            return {"local_pdf_path": s3_path}
-        return {"local_pdf_path": None}
         # Get the requested sample
         print(f"\n=== Displaying sample {args.sample_index} ===")
         sample = dataset[args.sample_index]
@@ -931,10 +921,6 @@ if __name__ == "__main__":
                 print(f"  Role: {msg['role']}")
                 print(f"  Content preview: {str(msg['content'])[:200]}...")
 
-        logger.info("Loading fine tuning dataset from OpenAI style batch responses")
-    
-        response_data = load_jsonl_into_ds(response_glob_path)
-        response_data = response_data["train"]
         # If it's tokenized data
         if "input_ids" in sample:
             print(f"\n=== Tokenized Output ===")
@@ -1113,5 +1099,5 @@ if __name__ == "__main__":
                     range_str = f"{start:>5}-{end:>5}"
                     print(f"{range_str:>15} | {count:>6} | {bar}")
 
-        else:
-            raise AssertionError("Expected some data to be created at this point")
+    else:
+        raise AssertionError("Expected some data to be created at this point")
