@@ -12,7 +12,6 @@ from typing import Any, Dict, Optional
 import numpy as np
 import torch
 import wandb
-<<<<<<< HEAD
 #from datasets.utils import disable_progress_bars
 from datasets.utils.logging import set_verbosity
 from peft import LoraConfig, get_peft_model  
@@ -41,7 +40,7 @@ from olmocr.train.utils import (
     log_trainable_parameters,
     make_dataset,
     setup_environment,
-=======
+
 from torch.amp import autocast
 from torch.optim import AdamW
 from torch.utils.data import ConcatDataset, DataLoader
@@ -51,14 +50,13 @@ from transformers import (
     Qwen2_5_VLForConditionalGeneration,
     Qwen2VLForConditionalGeneration,
     get_scheduler,
->>>>>>> upstream/main
 )
 
 from olmocr.train.config import Config
 from olmocr.train.dataloader import BaseMarkdownPDFDataset
 from olmocr.train.muon import SingleDeviceMuonWithAuxAdam
 
-<<<<<<< HEAD
+
 class CheckpointUploadCallback(TrainerCallback):
     def __init__(self, save_path: str, logger: Optional[Logger] = None):
         self.save_path = save_path
@@ -77,7 +75,7 @@ class CheckpointUploadCallback(TrainerCallback):
             self.logger.info(dir_name)
             copy_dir(str(latest_checkpoint), f"{self.save_path}/{dir_name}")
             self.logger.info("Saved checkpoint to %s", f"{self.save_path}/{dir_name}")
-=======
+
 # Configure logging
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
@@ -85,7 +83,6 @@ logging.basicConfig(
     level=logging.INFO,
 )
 logger = logging.getLogger(__name__)
->>>>>>> upstream/main
 
 
 class QwenDataCollator:
@@ -197,20 +194,17 @@ def load_checkpoint(
     model = model_class.from_pretrained(checkpoint_dir, **init_kwargs)
     model.to(device)
 
-<<<<<<< HEAD
     logger_level = logging.ERROR
     logger = get_logger(__name__, level=logger_level)
     set_verbosity(logger_level)
-=======
+
     optimizer.load_state_dict(torch.load(os.path.join(checkpoint_dir, "optimizer.pt"), map_location=device))
     lr_scheduler.load_state_dict(torch.load(os.path.join(checkpoint_dir, "scheduler.pt"), map_location=device))
->>>>>>> upstream/main
 
     state = torch.load(os.path.join(checkpoint_dir, "training_state.pt"), map_location=device)
     logger.info(f"Resumed from checkpoint: {checkpoint_dir} at epoch {state['epoch']:.2f}, step {state['global_step']}, samples seen {state['samples_seen']}")
     return model, state
 
-<<<<<<< HEAD
     #setup_environment(aws_config=config.aws, wandb_config=config.wandb, WANDB_RUN_GROUP=run_name.group)
 
     processor = AutoProcessor.from_pretrained(config.model.name_or_path, trust_remote_code=True)
@@ -227,7 +221,6 @@ def load_checkpoint(
     else:
         from .molmo.config_molmo import MolmoConfig
         from .molmo.modeling_molmo import MolmoForCausalLM
-=======
 
 def evaluate_model(
     model: torch.nn.Module,
@@ -241,7 +234,6 @@ def evaluate_model(
     for dataset_name, dataloader in eval_dataloaders.items():
         total_loss = 0.0
         num_batches = 0
->>>>>>> upstream/main
 
         with torch.no_grad():
             for batch in dataloader:
@@ -263,7 +255,6 @@ def evaluate_model(
         overall_loss = sum(eval_metrics.values()) / len(eval_metrics)
         eval_metrics["eval_loss"] = overall_loss
 
-<<<<<<< HEAD
         model = MolmoForCausalLM.from_pretrained(config.model.name_or_path, torch_dtype=torch.bfloat16, config=model_config, trust_remote_code=True)
 
     logger.info(model)
@@ -359,9 +350,7 @@ def evaluate_model(
         # for entry in tqdm(train_dataloader):
         #     print("Step!")
         #     model.forward(**{k: v.to("cuda:0") for (k,v) in entry.items()})
-=======
     return eval_metrics
->>>>>>> upstream/main
 
 
 def main():
