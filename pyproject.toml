@@ -101,20 +101,14 @@ train = [
     #"torch",
     #"torchvision",
     "accelerate",
-<<<<<<< HEAD
     "datasets==3.5.1",
-=======
->>>>>>> upstream/main
     "peft",
     "wandb",
     "omegaconf",
     "einops",
-<<<<<<< HEAD
     "flash-attn==2.7.3"
     #"transformers>=4.45.1"
-=======
     "augraphy",
->>>>>>> upstream/main
 ]
 
 elo = [
