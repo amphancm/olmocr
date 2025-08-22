@@ -832,13 +832,9 @@ if __name__ == "__main__":
         type=str,
         help="Save the processed image to the specified file path (e.g., output.png)",
     )
-<<<<<<< HEAD
-    
     return dataset
-=======
 
     args = parser.parse_args()
->>>>>>> upstream/main
 
     # Import config module
     from olmocr.train.config import Config
