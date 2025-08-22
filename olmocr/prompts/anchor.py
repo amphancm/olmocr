@@ -5,6 +5,7 @@ import random
 import re
 import subprocess
 from dataclasses import dataclass
+from os import PathLike
 from typing import List, Literal
 
 import ftfy
@@ -16,7 +17,7 @@ from olmocr.filter.coherency import get_document_coherency
 
 
 def get_anchor_text(
-    local_pdf_path: str, page: int, pdf_engine: Literal["pdftotext", "pdfium", "pypdf", "topcoherency", "pdfreport"], target_length: int = 4000
+    local_pdf_path: str | PathLike, page: int, pdf_engine: Literal["pdftotext", "pdfium", "pypdf", "topcoherency", "pdfreport"], target_length: int = 4000
 ) -> str:
     assert page > 0, "Pages are 1-indexed in pdf-land"
 

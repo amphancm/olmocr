@@ -145,7 +145,7 @@ if has_aws_creds:
 # Create first experiment spec
 experiment_spec = ExperimentSpec(
     description=f"OlmOCR Benchmark Run - Branch: {git_branch}, Commit: {git_hash}",
-    budget="ai2/oe-data",
+    budget="ai2/oe-base",
     tasks=[TaskSpec(**task_spec_args)],
 )
 
@@ -181,7 +181,8 @@ perf_task_spec_args = {
         priority=Priority.normal,
         preemptible=True,
     ),
-    "resources": TaskResources(gpu_count=1),
+    # Need to reserve all 8 gpus for performance spec or else benchmark results can be off
+    "resources": TaskResources(gpu_count=8),
     "constraints": Constraints(cluster=["ai2/ceres-cirrascale", "ai2/jupiter-cirrascale-2"]),
     "result": ResultSpec(path="/noop-results"),
 }
@@ -195,7 +196,7 @@ if has_aws_creds:
 # Create performance experiment spec
 perf_experiment_spec = ExperimentSpec(
     description=f"OlmOCR Performance Test - Branch: {git_branch}, Commit: {git_hash}",
-    budget="ai2/oe-data",
+    budget="ai2/oe-base",
     tasks=[TaskSpec(**perf_task_spec_args)],
 )
 

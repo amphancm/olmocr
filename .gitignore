@@ -14,6 +14,7 @@ localworkspace/*
 math_data/*
 math_data_big/*
 gpt4otestset/*
+old_train/
 gpt4otestset_output/*
 pdfs/*
 olmOCR-bench/*
@@ -21,6 +22,7 @@ table_data*/
 /synth*/
 dolma_samples/*
 old_train/
+augraphy_cache/
 /*.html
 scoreelo.csv
 debug.log

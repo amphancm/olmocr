@@ -173,3 +173,28 @@ class WorkerTracker:
         Use 'await get_status_table()' to retrieve the status table.
         """
         raise NotImplementedError("Use 'await get_status_table()' to get the status table.")
+
+
+async def cpu_vs_wall(interval: float = 1.0):
+    """
+    Periodically print the percentage of wall-clock time that was
+    consumed as CPU time since the previous sample.
+    """
+    last_wall = time.perf_counter()
+    last_cpu = time.process_time()
+
+    while True:
+        await asyncio.sleep(interval)
+
+        # elapsed times
+        wall_now = time.perf_counter()
+        cpu_now = time.process_time()
+
+        wall_delta = wall_now - last_wall
+        cpu_delta = cpu_now - last_cpu
+
+        last_wall, last_cpu = wall_now, cpu_now
+
+        # On a single core, 100 % means fully CPU-bound.
+        pct = 100.0 * cpu_delta / wall_delta if wall_delta else 0.0
+        print(f"CPU load (over {interval:.1f}s): {pct:5.1f} %")
