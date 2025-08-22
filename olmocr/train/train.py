@@ -40,7 +40,7 @@ from olmocr.train.utils import (
     log_trainable_parameters,
     make_dataset,
     setup_environment,
-
+)
 from torch.amp import autocast
 from torch.optim import AdamW
 from torch.utils.data import ConcatDataset, DataLoader
