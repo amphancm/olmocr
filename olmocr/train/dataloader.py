@@ -893,7 +893,6 @@ if __name__ == "__main__":
             print(f"\nError: Sample index {args.sample_index} out of range. Only {len(dataset)} samples available.")
             exit(1)
 
-<<<<<<< HEAD
     # Define the download function to use in parallel processing
     def cache_file(example):
         s3_path = example["s3_path"]
@@ -903,11 +902,9 @@ if __name__ == "__main__":
             #return {"local_pdf_path": local_path}
             return {"local_pdf_path": s3_path}
         return {"local_pdf_path": None}
-=======
         # Get the requested sample
         print(f"\n=== Displaying sample {args.sample_index} ===")
         sample = dataset[args.sample_index]
->>>>>>> upstream/main
 
         # Display sample information based on pipeline output
         print("\nSample keys:", list(sample.keys()))
