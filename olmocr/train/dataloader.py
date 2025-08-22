@@ -931,12 +931,10 @@ if __name__ == "__main__":
                 print(f"  Role: {msg['role']}")
                 print(f"  Content preview: {str(msg['content'])[:200]}...")
 
-<<<<<<< HEAD
     logger.info("Loading fine tuning dataset from OpenAI style batch responses")
     
     response_data = load_jsonl_into_ds(response_glob_path)
     response_data = response_data["train"]
-=======
         # If it's tokenized data
         if "input_ids" in sample:
             print(f"\n=== Tokenized Output ===")
@@ -944,7 +942,6 @@ if __name__ == "__main__":
             print(f"  Input IDs shape: {sample['input_ids'].shape}")
             print(f"  Labels shape: {sample['labels'].shape}")
             print(f"  Attention mask shape: {sample['attention_mask'].shape}")
->>>>>>> upstream/main
 
             if "pixel_values" in sample:
                 print(f"  Pixel values shape: {sample['pixel_values'].shape}")
