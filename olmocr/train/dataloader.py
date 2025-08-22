@@ -931,10 +931,10 @@ if __name__ == "__main__":
                 print(f"  Role: {msg['role']}")
                 print(f"  Content preview: {str(msg['content'])[:200]}...")
 
-    logger.info("Loading fine tuning dataset from OpenAI style batch responses")
+        logger.info("Loading fine tuning dataset from OpenAI style batch responses")
     
-    response_data = load_jsonl_into_ds(response_glob_path)
-    response_data = response_data["train"]
+        response_data = load_jsonl_into_ds(response_glob_path)
+        response_data = response_data["train"]
         # If it's tokenized data
         if "input_ids" in sample:
             print(f"\n=== Tokenized Output ===")
@@ -1113,5 +1113,5 @@ if __name__ == "__main__":
                     range_str = f"{start:>5}-{end:>5}"
                     print(f"{range_str:>15} | {count:>6} | {bar}")
 
-    else:
-        raise AssertionError("Expected some data to be created at this point")
+        else:
+            raise AssertionError("Expected some data to be created at this point")
