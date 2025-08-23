@@ -27,8 +27,8 @@ from transformers.integrations import WandbCallback
 from transformers.trainer_callback import TrainerControl, TrainerState
 from transformers.trainer_utils import get_last_checkpoint
 
-from olmocr.train.core.cli import make_cli, save_config, to_native_types
-from olmocr.train.core.config import TrainConfig
+#from olmocr.train.core.cli import make_cli, save_config, to_native_types
+#from olmocr.train.core.config import TrainConfig
 from olmocr.train.core.loggers import get_logger
 from olmocr.train.core.paths import copy_dir, join_path
 from olmocr.train.core.state import BeakerState
