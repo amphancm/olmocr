@@ -106,7 +106,7 @@ train = [
     "s3fs",
     "necessary",
     "einops",
-    "flash-attn==2.7.3"
+    #"flash-attn==2.7.3"
     #"transformers>=4.45.1"
 ]
 
