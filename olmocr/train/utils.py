@@ -207,8 +207,10 @@ class TruncatingCollator:
                 "input_ids": truncated_input_ids,
                 "attention_mask": truncated_attention_mask,
                 "labels": truncated_labels,
-                "pixel_values": torch.tensor(batch[0]["pixel_values"]).unsqueeze(0),
-                "image_grid_thw": torch.tensor(batch[0]["image_grid_thw"]).unsqueeze(0),
+                # "pixel_values": torch.tensor(batch[0]["pixel_values"]).unsqueeze(0),
+                # "image_grid_thw": torch.tensor(batch[0]["image_grid_thw"]).unsqueeze(0),
+                "pixel_values": batch[0]["pixel_values"].detach().clone().unsqueeze(0),
+                "image_grid_thw": batch[0]["image_grid_thw"].detach().clone().unsqueeze(0),
             }
         elif "image_input_idx" in batch[0]:
             # molmo case
