@@ -43,22 +43,24 @@ def prepare_data_for_qwen2_training(example, processor, target_longest_image_dim
         text=[text],
         images=[main_image],
         padding=True,
-        return_tensors="np",
+        return_tensors="pt",
     )
 
     # Get labels by tokenizing the output text
-    labels = processor(text=[example["response"]], padding=True, return_tensors="np")
+    labels = processor(text=[example["response"]], padding=True, return_tensors="pt")
 
     # Append an <|im_end|>\n" to the labels, because this is what it would look like
     # if we passed the whole message stream in there
     im_end_tokens = processor.tokenizer("<|im_end|>\n", add_special_tokens=False)["input_ids"]
-    im_end_tokens = np.array(im_end_tokens, dtype=inputs.input_ids.dtype)  # Ensure correct dtype
+    #im_end_tokens = np.array(im_end_tokens, dtype=inputs.input_ids.dtype)  # Ensure correct dtype
+    im_end_tokens = torch.tensor(im_end_tokens, dtype=inputs.input_ids.dtype)
 
     # Handle the case where labels['input_ids'] is empty
     if labels["input_ids"].shape[1] == 0:
         labels_input_ids_0 = np.array([], dtype=inputs.input_ids.dtype)
     else:
-        labels_input_ids_0 = labels["input_ids"][0].astype(inputs.input_ids.dtype)
+        #labels_input_ids_0 = labels["input_ids"][0].astype(inputs.input_ids.dtype)
+        labels_input_ids_0 = labels["input_ids"][0].to(dtype=inputs.input_ids.dtype)
 
     labels["input_ids"] = np.concatenate([labels_input_ids_0, im_end_tokens])
     labels["input_ids"] = np.expand_dims(labels["input_ids"], axis=0)
