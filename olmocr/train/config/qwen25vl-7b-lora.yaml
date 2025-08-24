@@ -70,7 +70,7 @@ lora:
       - visual.merger.mlp.2
 
 save:
-  path: /content/drive/MyDrive/TrainModel/olmocr
+  path: /content/drive/MyDrive/TrainModel/typhoon
   save_every_steps: 50
 
 max_workers: 10
