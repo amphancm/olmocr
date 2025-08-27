@@ -262,7 +262,21 @@ async def process_page(args, worker_id: int, pdf_orig_path: str, pdf_local_path:
             )
 
             model_response_json = json.loads(base_response_data["choices"][0]["message"]["content"])
-            page_response = PageResponse(**model_response_json)
+
+            if isinstance(model_response_json, str):
+                model_response_json = {"natural_text": model_response_json}
+
+            defaults = {
+                "primary_language": None,
+                "is_rotation_valid": True,
+                "rotation_correction": 0,
+                "is_table": False,
+                "is_diagram": False,
+                "natural_text": None,
+            }
+
+            merged_response = {**defaults, **model_response_json}
+            page_response = PageResponse(**merged_response)
 
             if not page_response.is_rotation_valid and attempt < MAX_RETRIES - 1:
                 logger.info(
