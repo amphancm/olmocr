@@ -100,9 +100,23 @@ def openai_response_format_schema() -> dict:
 # It's simplified from the prompt which was used to generate the silver data, and can change from dataset to dataset
 def build_finetuning_prompt(base_text: str) -> str:
     return (
-        f"Below is the image of one page of a document, as well as some raw textual content that was previously extracted for it. "
-        f"Just return the plain text representation of this document as if you were reading it naturally.\n"
-        f"Do not hallucinate.\n"
+        "Below is the image of one page of a document, as well as some raw textual content that was previously extracted for it. "
+        "Just return the plain text representation of this document as if you were reading it naturally.\n"
+        "Turn equations into a LaTeX representation, and tables into markdown format. Remove the headers and footers, but keep references and footnotes.\n"
+        "Read any natural handwriting.\n"
+        "This is likely one page out of several in the document, so be sure to preserve any sentences that come from the previous page, or continue onto the next page, exactly as they are.\n"
+        "If there is no text at all that you think you should read, you can output null.\n"
+        "Your output must be a JSON object with the following schema:\n"
+        "{\n"
+        '    "primary_language": "The primary language of the text using two-letter codes or null if there is no text at all that you think you should read.",\n'
+        '    "is_rotation_valid": "Is this page oriented correctly for reading? Answer only considering the textual content, do not factor in the rotation of any charts, tables, drawings, or figures.",\n'
+        '    "rotation_correction": "Indicates the degree of clockwise rotation needed if the page is not oriented correctly. Must be one of [0, 90, 180, 270].",\n'
+        '    "is_table": "Indicates if the majority of the page content is in tabular format.",\n'
+        '    "is_diagram": "Indicates if the majority of the page content is a visual diagram.",\n'
+        '    "natural_text": "The natural text content extracted from the page."\n'
+        "}\n"
+        "Do not add any other text to your response outside of the JSON object.\n"
+        "Do not hallucinate.\n"
         f"RAW_TEXT_START\n{base_text}\nRAW_TEXT_END"
     )
 
