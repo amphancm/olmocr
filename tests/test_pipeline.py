@@ -192,6 +192,7 @@ class MockArgs:
     max_page_retries: int = 8
     target_longest_image_dim: int = 1288
     guided_decoding: bool = False
+    server: str | None = None
 
 
 class TestRotationCorrection:

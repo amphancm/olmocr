@@ -22,8 +22,11 @@ table_data*/
 /synth*/
 dolma_samples/*
 old_train/
+filtered_items/
+filtered_items_prefilter/
 augraphy_cache/
 /*.html
+html_templates*/
 scoreelo.csv
 debug.log
 birrpipeline-debug.log
