@@ -23,13 +23,19 @@ from tqdm import tqdm
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
+
 def upload_file_to_gcs(*args, **kwargs):
-    raise NotImplementedError("GCS upload disabled in local mode")
+    # Disabled in local mode
+    print("[s3_utils] Skipping upload_file_to_gcs (GCS disabled).")
 
 def download_file_from_gcs(*args, **kwargs):
-    raise NotImplementedError("GCS download disabled in local mode")
+    # Disabled in local mode
+    print("[s3_utils] Skipping download_file_from_gcs (GCS disabled).")
+    return None
 
 def check_blob_exists(*args, **kwargs):
+    # Always return False since GCS is not used
+    print("[s3_utils] Skipping check_blob_exists (GCS disabled).")
     return False
 
 
