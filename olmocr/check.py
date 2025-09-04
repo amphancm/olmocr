@@ -2,6 +2,7 @@ import importlib.util
 import logging
 import subprocess
 import sys
+import torch
 
 logger = logging.getLogger(__name__)
 
