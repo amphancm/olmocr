@@ -8,7 +8,9 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import boto3
 import markdown2
-import smart_open
+#import smart_open
+import smart_open.local_file as smart_open
+
 from botocore.exceptions import NoCredentialsError, PartialCredentialsError
 from jinja2 import Template
 from tqdm import tqdm
