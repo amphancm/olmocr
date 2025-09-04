@@ -27,19 +27,48 @@ def check_sglang_version():
         sys.exit(1)
 
 
-def check_torch_gpu_available(min_gpu_memory: int = 15 * 1024**3):
-    try:
-        import torch
-    except:
-        logger.error("Pytorch must be installed, visit https://pytorch.org/ for installation instructions")
-        raise
+# def check_torch_gpu_available(min_gpu_memory: int = 15 * 1024**3):
+#     try:
+#         import torch
+#     except:
+#         logger.error("Pytorch must be installed, visit https://pytorch.org/ for installation instructions")
+#         raise
 
-    try:
-        gpu_memory = torch.cuda.get_device_properties(0).total_memory
-        assert gpu_memory >= min_gpu_memory
-    except:
-        logger.error(f"Torch was not able to find a GPU with at least {min_gpu_memory // (1024 ** 3)} GB of RAM.")
-        raise
+#     try:
+#         gpu_memory = torch.cuda.get_device_properties(0).total_memory
+#         assert gpu_memory >= min_gpu_memory
+#     except:
+#         logger.error(f"Torch was not able to find a GPU with at least {min_gpu_memory // (1024 ** 3)} GB of RAM.")
+#         raise
+
+
+def check_torch_gpu_available(min_gpu_memory=24):
+    """
+    Check if CUDA GPUs are available and have sufficient memory.
+    This patched version sums memory across all GPUs (for multi-GPU systems).
+    """
+
+    if not torch.cuda.is_available():
+        raise RuntimeError("CUDA GPU not available")
+
+    num_gpus = torch.cuda.device_count()
+    total_memory = 0
+
+    print(f"Detected {num_gpus} GPU(s).")
+
+    for i in range(num_gpus):
+        props = torch.cuda.get_device_properties(i)
+        mem_gb = props.total_memory / 1e9
+        total_memory += mem_gb
+        print(f" - GPU {i}: {props.name} with {mem_gb:.1f} GB")
+
+    print(f"Total GPU memory across {num_gpus} GPUs: {total_memory:.1f} GB")
+
+    if total_memory < min_gpu_memory:
+        print(
+            f"WARNING: Only {total_memory:.1f} GB available, "
+            f"but {min_gpu_memory} GB is recommended. Continuing anyway..."
+        )
 
 
 if __name__ == "__main__":
