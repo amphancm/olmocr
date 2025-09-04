@@ -17,11 +17,20 @@ import zstandard as zstd
 from boto3.s3.transfer import TransferConfig
 from botocore.config import Config
 from botocore.exceptions import ClientError
-from google.cloud import storage
+#from google.cloud import storage
 from tqdm import tqdm
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
+
+def upload_file_to_gcs(*args, **kwargs):
+    raise NotImplementedError("GCS upload disabled in local mode")
+
+def download_file_from_gcs(*args, **kwargs):
+    raise NotImplementedError("GCS download disabled in local mode")
+
+def check_blob_exists(*args, **kwargs):
+    return False
 
 
 def parse_s3_path(s3_path: str) -> tuple[str, str]:
