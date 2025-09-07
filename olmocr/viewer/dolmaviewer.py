@@ -8,7 +8,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import boto3
 import markdown2
-#import smart_open
+import smart_open
 from smart_open.local_file import open as smart_open
 
 
