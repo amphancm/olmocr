@@ -226,6 +226,21 @@ class FrontMatterParser(PipelineStep):
                 continue
 
             if field_name not in front_matter_dict:
+                # Adding this to be more robust to models that don't always produce the YAML fields
+                if self.front_matter_class == PageResponse:
+                    if field_name == "is_rotation_valid":
+                        kwargs[field_name] = True
+                        continue
+                    if field_name == "rotation_correction":
+                        kwargs[field_name] = 0
+                        continue
+                    if field_name == "is_table":
+                        kwargs[field_name] = False
+                        continue
+                    if field_name == "is_diagram":
+                        kwargs[field_name] = False
+                        continue
+
                 origin = get_origin(field_type)
                 if origin is Union and type(None) in get_args(field_type):
                     kwargs[field_name] = None
