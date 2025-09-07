@@ -271,6 +271,8 @@ async def process_page(args, worker_id: int, pdf_orig_path: str, pdf_local_path:
 
             parser = FrontMatterParser(front_matter_class=PageResponse)
             front_matter, text = parser._extract_front_matter_and_text(model_response_markdown)
+            if "primary_language" not in front_matter or front_matter["primary_language"] is None:
+                front_matter["primary_language"] = "th"
             page_response = parser._parse_front_matter(front_matter, text)
 
             if not page_response.is_rotation_valid and attempt < MAX_RETRIES - 1:
