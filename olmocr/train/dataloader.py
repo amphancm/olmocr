@@ -226,7 +226,12 @@ class FrontMatterParser(PipelineStep):
                 continue
 
             if field_name not in front_matter_dict:
-                raise ValueError(f"Missing required field '{field_name}' in front matter")
+                origin = get_origin(field_type)
+                if origin is Union and type(None) in get_args(field_type):
+                    kwargs[field_name] = None
+                    continue
+                else:
+                    raise ValueError(f"Missing required field '{field_name}' in front matter")
 
             value = front_matter_dict[field_name]
 
