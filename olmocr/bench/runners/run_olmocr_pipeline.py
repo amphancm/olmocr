@@ -18,7 +18,8 @@ client = openai.AsyncOpenAI(
 )
 
 # ชื่อโมเดลที่ VLLM กำลังให้บริการ
-MODEL_NAME = "allenai/olmOCR-7B-0225-preview"
+#MODEL_NAME = "allenai/olmOCR-7B-0825-preview"
+MODEL_NAME = "scb10x/typhoon-ocr-3b"
 MAX_TOKENS = 4096 # กำหนด max tokens สำหรับ output
 
 async def run_olmocr_pipeline(
