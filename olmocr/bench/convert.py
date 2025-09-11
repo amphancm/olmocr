@@ -203,7 +203,7 @@ async def process_pdfs(config, pdf_directory, data_directory, repeats, remove_te
 
 
 # --- VLLM SERVER MANAGEMENT START ---
-async def wait_for_server_ready(url, timeout=120):
+async def wait_for_server_ready(url, timeout=300):
     """เช็ค health endpoint ของ server จนกว่าจะพร้อมใช้งานหรือหมดเวลา"""
     start_time = time.time()
     print("Waiting for VLLM server to be ready...")
@@ -306,11 +306,12 @@ if __name__ == "__main__":
         # ใช้ sys.executable เพื่อให้แน่ใจว่าใช้ python interpreter เดียวกัน
         command = [
             sys.executable, "-m", "vllm.entrypoints.openai.api_server",
-            "--model", "allenai/olmOCR-7B-0225-preview",
-            "--trust-remote-code"
+            "--model", "scb10x/typhoon-ocr-7b",
+            "--trust-remote-code",
+            "--gpu-memory-utilization", "0.70"
         ]
         # เริ่ม VLLM server เป็น background process
-        vllm_process = subprocess.Popen(command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        vllm_process = subprocess.Popen(command)
     
     try:
         if vllm_process:
